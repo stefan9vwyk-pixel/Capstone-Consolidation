@@ -1,0 +1,329 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>accounts.management_views &mdash; Newsroom 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Newsroom
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">news_project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Newsroom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">accounts.management_views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for accounts.management_views</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Management views for user administration.</span>
+
+<span class="sd">These views are protected by the `editor_required` decorator and are</span>
+<span class="sd">intended for editors to list, inspect, create, edit and deactivate</span>
+<span class="sd">user accounts. Small docstrings and inline comments clarify behavior</span>
+<span class="sd">for maintainers and template authors.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span><span class="p">,</span> <span class="n">Count</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomUser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">editor_required</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.management_forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserCreateForm</span><span class="p">,</span> <span class="n">UserEditForm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">news.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Newsletter</span>
+
+
+<div class="viewcode-block" id="user_list_view">
+<a class="viewcode-back" href="../../accounts.html#accounts.management_views.user_list_view">[docs]</a>
+<span class="nd">@editor_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_list_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List users for administrative purposes.</span>
+
+<span class="sd">    Supports optional filtering by search query, role and active status.</span>
+<span class="sd">    Annotates each user with counts of related `Article` and</span>
+<span class="sd">    `Newsletter` objects for convenient display in the template.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">users</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+        <span class="n">article_count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;articles&#39;</span><span class="p">,</span> <span class="n">distinct</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+        <span class="n">newsletter_count</span><span class="o">=</span><span class="n">Count</span><span class="p">(</span><span class="s1">&#39;newsletters&#39;</span><span class="p">,</span> <span class="n">distinct</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;last_name&#39;</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Free-text search across common user fields</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">first_name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">last_name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">username__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">email__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">role_filter</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;role&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">role_filter</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;reader&#39;</span><span class="p">,</span> <span class="s1">&#39;journalist&#39;</span><span class="p">,</span> <span class="s1">&#39;editor&#39;</span><span class="p">):</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="n">role_filter</span><span class="p">)</span>
+
+    <span class="n">active_filter</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">active_filter</span> <span class="o">==</span> <span class="s1">&#39;active&#39;</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">active_filter</span> <span class="o">==</span> <span class="s1">&#39;inactive&#39;</span><span class="p">:</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">all_users</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;total&#39;</span><span class="p">:</span>       <span class="n">all_users</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;editors&#39;</span><span class="p">:</span>     <span class="n">all_users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s1">&#39;editor&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;journalists&#39;</span><span class="p">:</span> <span class="n">all_users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s1">&#39;journalist&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;readers&#39;</span><span class="p">:</span>     <span class="n">all_users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s1">&#39;reader&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;inactive&#39;</span><span class="p">:</span>    <span class="n">all_users</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_active</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/user_list.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;users&#39;</span><span class="p">:</span>        <span class="n">users</span><span class="p">,</span>
+        <span class="s1">&#39;stats&#39;</span><span class="p">:</span>        <span class="n">stats</span><span class="p">,</span>
+        <span class="s1">&#39;query&#39;</span><span class="p">:</span>        <span class="n">query</span><span class="p">,</span>
+        <span class="s1">&#39;role_filter&#39;</span><span class="p">:</span>  <span class="n">role_filter</span><span class="p">,</span>
+        <span class="s1">&#39;active_filter&#39;</span><span class="p">:</span> <span class="n">active_filter</span><span class="p">,</span>
+        <span class="s1">&#39;total_count&#39;</span><span class="p">:</span>  <span class="n">users</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="user_detail_view">
+<a class="viewcode-back" href="../../accounts.html#accounts.management_views.user_detail_view">[docs]</a>
+<span class="nd">@editor_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_detail_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show detailed information about a single user.</span>
+
+<span class="sd">    Returns the most recent articles and newsletters authored by the</span>
+<span class="sd">    target user, basic approval stats, and role-specific context used by</span>
+<span class="sd">    the admin templates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">CustomUser</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="c1"># Recent authored content for quick preview</span>
+    <span class="n">articles</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">author</span><span class="o">=</span><span class="n">target</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_at&#39;</span><span class="p">)[:</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">newsletters</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+        <span class="n">author</span><span class="o">=</span><span class="n">target</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;-created_at&#39;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;total_articles&#39;</span><span class="p">:</span>    <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;approved_articles&#39;</span><span class="p">:</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">author</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">approved</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;pending_articles&#39;</span><span class="p">:</span>  <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">author</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">approved</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="s1">&#39;total_newsletters&#39;</span><span class="p">:</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Role-specific context</span>
+    <span class="n">reader_context</span> <span class="o">=</span> <span class="n">journalist_context</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;reader&#39;</span><span class="p">:</span>
+        <span class="n">reader_context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;subscribed_publishers&#39;</span><span class="p">:</span> <span class="n">target</span><span class="o">.</span><span class="n">reader_subscribed_publishers</span><span class="p">,</span>
+            <span class="s1">&#39;subscribed_journalists&#39;</span><span class="p">:</span> <span class="n">target</span><span class="o">.</span><span class="n">reader_subscribed_journalists</span><span class="p">,</span>
+            <span class="s1">&#39;publisher_count&#39;</span><span class="p">:</span> <span class="n">target</span><span class="o">.</span><span class="n">subscribed_publishers</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+            <span class="s1">&#39;journalist_count&#39;</span><span class="p">:</span> <span class="n">target</span><span class="o">.</span><span class="n">subscribed_journalists</span><span class="o">.</span><span class="n">count</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;journalist&#39;</span><span class="p">,</span> <span class="s1">&#39;editor&#39;</span><span class="p">):</span>
+        <span class="n">ind_articles</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">journalist_independent_articles</span>
+        <span class="n">ind_newsletters</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">journalist_independent_newsletters</span>
+        <span class="n">journalist_context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;independent_articles&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">ind_articles</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="k">if</span> <span class="n">ind_articles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;independent_newsletters&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">ind_newsletters</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="k">if</span> <span class="n">ind_newsletters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;independent_article_count&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">ind_articles</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="k">if</span> <span class="n">ind_articles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;independent_newsletter_count&#39;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">ind_newsletters</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="k">if</span> <span class="n">ind_newsletters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/user_detail.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;target&#39;</span><span class="p">:</span>             <span class="n">target</span><span class="p">,</span>
+        <span class="s1">&#39;articles&#39;</span><span class="p">:</span>           <span class="n">articles</span><span class="p">,</span>
+        <span class="s1">&#39;newsletters&#39;</span><span class="p">:</span>        <span class="n">newsletters</span><span class="p">,</span>
+        <span class="s1">&#39;stats&#39;</span><span class="p">:</span>              <span class="n">stats</span><span class="p">,</span>
+        <span class="s1">&#39;reader_context&#39;</span><span class="p">:</span>     <span class="n">reader_context</span><span class="p">,</span>
+        <span class="s1">&#39;journalist_context&#39;</span><span class="p">:</span> <span class="n">journalist_context</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="user_create_view">
+<a class="viewcode-back" href="../../accounts.html#accounts.management_views.user_create_view">[docs]</a>
+<span class="nd">@editor_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_create_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new user from the management interface.</span>
+
+<span class="sd">    On success redirects to the newly created user&#39;s detail page and</span>
+<span class="sd">    flashes a message confirming account creation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserCreateForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Account created for </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;accounts:user_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserCreateForm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/user_create.html&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="user_edit_view">
+<a class="viewcode-back" href="../../accounts.html#accounts.management_views.user_edit_view">[docs]</a>
+<span class="nd">@editor_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_edit_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Edit an existing user&#39;s account.</span>
+
+<span class="sd">    If the form is valid the changes are saved and the admin is</span>
+<span class="sd">    redirected to the user&#39;s detail page with a success message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">CustomUser</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="n">is_self</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserEditForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="c1"># Use a single-line f-string to avoid multi-line formatting issues</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Account updated for </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;accounts:user_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">UserEditForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">target</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;accounts/user_edit.html&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="s1">&#39;form&#39;</span><span class="p">:</span>    <span class="n">form</span><span class="p">,</span>
+        <span class="s1">&#39;target&#39;</span><span class="p">:</span>  <span class="n">target</span><span class="p">,</span>
+        <span class="s1">&#39;is_self&#39;</span><span class="p">:</span> <span class="n">is_self</span><span class="p">,</span>
+    <span class="p">})</span></div>
+
+
+
+<div class="viewcode-block" id="user_deactivate_view">
+<a class="viewcode-back" href="../../accounts.html#accounts.management_views.user_deactivate_view">[docs]</a>
+<span class="nd">@editor_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">user_deactivate_view</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Toggle the `is_active` flag for a user.</span>
+
+<span class="sd">    Editors cannot deactivate their own account. The endpoint expects a</span>
+<span class="sd">    POST request to perform the state toggle and provides feedback via</span>
+<span class="sd">    Django messages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">CustomUser</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;You cannot deactivate your own account.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;accounts:user_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">is_active</span>
+        <span class="n">target</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="s1">&#39;activated&#39;</span> <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">is_active</span> <span class="k">else</span> <span class="s1">&#39;deactivated&#39;</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="ow">or</span> <span class="n">target</span><span class="o">.</span><span class="n">username</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span>
+            <span class="n">request</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Account </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;accounts:user_detail&#39;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">pk</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Stefan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
