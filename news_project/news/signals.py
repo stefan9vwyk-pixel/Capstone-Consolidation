@@ -27,8 +27,9 @@ logger = logging.getLogger(__name__)
 def _collect_subscriber_emails(article):
     """
     Gather email addresses of users who have subscribed to:
-      - the article's journalist (author), or
-      - the article's publisher.
+    - the article's journalist (author), or
+    - the article's publisher.
+    
     Returns a deduplicated list of email strings.
     """
     emails = set()
