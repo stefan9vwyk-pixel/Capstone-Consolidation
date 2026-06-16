@@ -18,15 +18,15 @@ from django.contrib.auth.models import Group
 class CustomUser(AbstractUser):
     """Custom user model with role, subscriptions and helpers.
 
-    Fields added:
-    - `role`: determines permissions and group membership.
-    - `bio`, `avatar_url`: optional profile fields.
-    - `subscribed_publishers`, `subscribed_journalists`: M2M fields
+       Fields added:
+       - `role`: determines permissions and group membership.
+       - `bio`, `avatar_url`: optional profile fields.
+       - `subscribed_publishers`, `subscribed_journalists`: M2M fields
        used by readers to follow publishers and journalists.
 
-    The class exposes properties like `is_reader`, `can_create_content`,
-    and related managers (`journalist_articles`, `journalist_newsletters`)
-    to simplify view and template logic.
+       The class exposes properties like `is_reader`, `can_create_content`,
+       and related managers (`journalist_articles`, `journalist_newsletters`)
+       to simplify view and template logic.
     """
     ROLE_CHOICES = [
         ('reader', 'Reader'),
