@@ -12,13 +12,12 @@ from accounts.models import CustomUser
 from accounts.decorators import editor_required
 
 
-"""News app views for dashboard, articles, newsletters, publishers, and docs."""
-
-
 # ── Dashboard ───────────────────────────────────────────────────────────────
 
 def dashboard_view(request):
-    """Render the news dashboard with recent content and user-specific metrics."""
+    """
+    Render the news dashboard with recent content and user-specific metrics.
+    """
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
@@ -58,7 +57,9 @@ def dashboard_view(request):
 
 @login_required
 def article_list_view(request):
-    """Display a paginated, filterable list of articles for authorized users."""
+    """
+    Display a paginated, filterable list of articles for authorized users.
+    """
     base_qs = Article.objects.select_related(
         'author',
         'publisher'
