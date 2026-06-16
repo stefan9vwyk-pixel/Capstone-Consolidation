@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}API Reference — Newsroom{% endblock %}
+{% block topbar_title %}API Reference{% endblock %}
+
+{% block content %}
+<header class="page-header">
+  <div>
+    <h1 class="page-title">REST API Reference</h1>
+    <p class="page-subtitle">Token-authenticated JSON API. All endpoints are prefixed with <code class="ic">/api/</code>.</p>
+  </div>
+</header>
+
+<!-- Consolidated Active API Token Panel Component -->
+<div class="token-panel" role="region" aria-label="Personal API authentication token">
+  <div class="token-panel__icon" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+  </div>
+  <div class="token-panel__main">
+    <div class="token-panel__header-row">
+      <div class="token-panel__label">Your Personal API Token</div>
+      <span class="badge {{ request.user.role|yesno:'badge--accent,badge--neutral' }}">{{ request.user.get_role_display }}</span>
+    </div>
+    <div class="token-panel__row">
+      <code class="token-code" id="api-token">{% if request.user.auth_token %}{{ request.user.auth_token.key }}{% else %}No token generated. Save your profile configuration to initialize your key.{% endif %}</code>
+      <button class="btn btn--ghost btn--sm" id="copy-token-btn" type="button" aria-label="Copy token to clipboard">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 0-2-2V4a2 2 0 0 0 2-2h9a2 2 0 0 0 2 2v1"/></svg>
+        <span>Copy</span>
+      </button>
+    </div>
+    <div class="token-panel__hint">Header Rule: <code class="ic">Authorization: Token &lt;your-token&gt;</code></div>
+  </div>
+</div>
+
+<!-- Quick Start Guide -->
+<section class="form-section" aria-labelledby="quickstart-heading">
+  <h2 id="quickstart-heading" class="form-section__title">Quick Start</h2>
+  <div class="qs-steps">
+    <div class="qs-step">
+      <div class="qs-step__num" aria-hidden="true">1</div>
+      <div class="qs-step__content">
+        <strong>Set Header Credentials</strong>
+        <p>Pass your token inside the request header configuration blocks on every payload route.</p>
+      </div>
+    </div>
+    <div class="qs-step">
+      <div class="qs-step__num" aria-hidden="true">2</div>
+      <div class="qs-step__content">
+        <strong>JSON Response Stacks</strong>
+        <p>All data feeds are returned as JSON arrays. Lists are cleanly paginated at 20 items per viewpoint index.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- API Endpoint Index -->
+<main class="api-docs-container">
+  
+  <!-- Articles Endpoint -->
+  <article class="api-endpoint-card">
+    <header class="api-endpoint">
+      <span class="api-endpoint__method method--get">GET</span>
+      <span class="api-endpoint__method method--post">POST</span>
+      <code class="api-endpoint__path">/api/articles/</code>
+    </article>
+    <div class="api-endpoint-card__body">
+      <p>Manage and query application stories. Readers read approved text fields; authors submit entries to editorial lines.</p>
+      
+      <h3 class="api-endpoint-card__subtitle">Query Parameters</h3>
+      <ul class="info-box__list" style="margin-top: var(--sp-sm);">
+        <li><code>approved</code> (boolean) — Filter entries by current database approval state.</li>
+        <li><code>publisher</code> (int) — Filter content rows by a specific unique publisher ID.</li>
+        <li><code>q</code> or <code>search</code> — Full text query matching against titles or content bodies.</li>
+      </ul>
+    </div>
+  </article>
+
+  <!-- Newsletters Endpoint -->
+  <article class="api-endpoint-card">
+    <header class="api-endpoint">
+      <span class="api-endpoint__method method--get">GET</span>
+      <span class="api-endpoint__method method--post">POST</span>
+      <code class="api-endpoint__path">/api/newsletters/</code>
+    </header>
+    <div class="api-endpoint-card__body">
+      <p>Retrieve, manage, or compose active newsletter volumes distributed by active publishing nodes.</p>
+    </div>
+  </article>
+
+  <!-- Webhook Sub-Component -->
+  <article class="api-endpoint-card">
+    <header class="api-endpoint">
+      <span class="api-endpoint__method method--delete" style="background: var(--warning-light); color: var(--warning);">EVENT</span>
+      <code class="api-endpoint__path">Webhook System Signal Trigger</code>
+    </header>
+    <div class="api-endpoint-card__body">
+      <p>System triggers emit automated POST records tracking payload states whenever an entry completes validation checks.</p>
+      
+      <h3 class="api-endpoint-card__subtitle">JSON Structural Sample Output</h3>
+<pre class="api-code-block"><code>{
+  "article_id": 42,
+  "title": "Breaking News Headline Example",
+  "author": "journalist_username"
+}</code></pre>
+    </div>
+  </article>
+
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Clean modern clipboard handling block
+  const copyBtn = document.getElementById('copy-token-btn');
+  const tokenKey = document.getElementById('api-token');
+
+  if (copyBtn && tokenKey) {
+    copyBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(tokenKey.innerText.trim()).then(() => {
+        const textSpan = copyBtn.querySelector('span');
+        textSpan.innerText = 'Copied!';
+        setTimeout(() => { textSpan.innerText = 'Copy'; }, 2000);
+      }).catch(err => {
+        alert('Failed to copy token values');
+      });
+    });
+  }
+</script>
+{% endblock %}

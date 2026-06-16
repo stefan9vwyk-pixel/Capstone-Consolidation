@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Publisher — Newsroom{% endblock %}
+{% block topbar_title %}{{ action }} Publisher{% endblock %}
+
+
+{% block content %}
+<div class="article-form-wrap">
+
+    <!-- Breadcrumb Directory Route Map -->
+    <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+        <a href="{% url 'news:publisher_list' %}" class="breadcrumb__link">Publishers</a>
+        <span class="breadcrumb__sep" aria-hidden="true">/</span>
+        {% if newsletter %}
+            <a href="{% url 'news:publisher_detail' publisher.pk %}" class="breadcrumb__link">{{ publisher.title|truncatechars:20 }}</a>
+            <span class="breadcrumb__sep" aria-hidden="true">/</span>
+        {% endif %}
+        <span class="breadcrumb__current" aria-current="page">{{ action }}</span>
+    </nav>
+
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">{{ action }} Publisher</h1>
+            <p class="page-subtitle">
+                {% if action == 'Create' %}
+                    Configure operational identity parameters and staff directory permissions
+                {% else %}
+                    Update operational identity parameters and staff directory permissions
+                {% endif %}
+            </p>
+        </div>
+        <div class="page-header__actions">
+            <a href="{% if instance %}{% url 'news:publisher_detail' instance.pk %}{% else %}{% url 'news:publisher_list' %}{% endif %}" class="btn btn--ghost">Cancel</a>
+        </div>
+    </header>
+
+    <div class="pub-card" style="max-width: 650px; margin: 0 auto; padding: var(--sp-md); background: var(--bg-card, #fff); border-radius: 8px;">
+    
+    <form method="post" novalidate>
+    {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert--danger" role="alert">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
+        <!-- Section 1: Network Profile Credentials -->
+        <section class="form-section">
+            <h2 class="form-section__title">Publisher Profile Specifications</h2>
+
+            <!-- Name Field -->
+            <div class="field">
+                <label for="id_name">Agency Corporate Name <span class="field__label-required" aria-hidden="true">*</span></label>
+                <input type="text" name="name" id="id_name"
+                class="input{% if form.name.errors %} input--error{% endif %}"
+                value="{{ form.name.value|default:'' }}"
+                placeholder="e.g. The Daily Chronicle"
+                required aria-describedby="{% if form.name.errors %}name-err{% endif %}">
+            {% if form.name.errors %}
+                <div class="field__error" id="name-err" role="alert">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ form.name.errors.0 }}
+                </div>
+            {% endif %}
+            </div>
+
+            <!-- Website Field -->
+            <div class="field">
+                <label for="id_website">Corporate Website Domain URL</label>
+                <input type="url" name="website" id="id_website"
+                    class="input{% if form.website.errors %} input--error{% endif %}"
+                    value="{{ form.website.value|default:'' }}"
+                    placeholder="https://example.com"
+                    aria-describedby="{% if form.website.errors %}website-err{% endif %}">
+                {% if form.website.errors %}
+                <div class="field__error" id="website-err" role="alert">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ form.website.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Description Field -->
+            <div class="field">
+                <label for="id_description">Brief Agency Summary Overview</label>
+                <textarea name="description" id="id_description"
+                    class="input{% if form.description.errors %} input--error{% endif %}"
+                    style="min-height: 90px;"
+                    placeholder="Enter a brief contextual overview detailing what beats and geographical boundaries this network nodes covers…">{{ form.description.value|default:'' }}</textarea>
+                {% if form.description.errors %}
+                    <div class="field__error" role="alert">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        {{ form.description.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Section 2: Management Roster Multi-Select Staffing -->
+        <section class="form-section">
+            <h2 class="form-section__title">Staff Assignment & Node Clearances</h2>
+            <p style="font-size: 13px; color: var(--text-sec); margin-bottom: var(--sp-sm);">Designate authenticated system actors permission access scopes over this specific publisher timeline mapping.</p>
+
+            <!-- Editors Selection -->
+            <div class="field" style="margin-bottom: var(--sp-md);">
+                <label for="id_editors">Assign Senior Editors</label>
+                <select name="editors" id="id_editors" class="input input--multiselect" multiple aria-describedby="editors-help">
+                    {% for editor in form.editors.field.queryset %}
+                        <option value="{{ editor.pk }}"
+                            {% if editor in form.editors.initial or editor.pk|stringformat:"s" in form.editors.value %}selected{% endif %}>
+                            {{ editor.get_full_name|default:editor.username }} (@{{ editor.username }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <span class="field__help" id="editors-help">Hold <strong>Ctrl</strong> (or <strong>Cmd</strong> on Apple Macs) to select multiple supervisors.</span>
+                {% if form.editors.errors %}
+                    <div class="field__error" role="alert">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        {{ form.editors.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+
+        <!-- Journalists Selection -->
+        <div class="field">
+            <label for="id_journalists">Assign Staff Journalists</label>
+            <select name="journalists" id="id_journalists" class="input input--multiselect" multiple aria-describedby="journalists-help">
+                {% for journalist in form.journalists.field.queryset %}
+                    <option value="{{ journalist.pk }}"
+                        {% if journalist in form.journalists.initial or journalist.pk|stringformat:"s" in form.journalists.value %}selected{% endif %}>
+                        {{ journalist.get_full_name|default:journalist.username }} (@{{ journalist.username }})
+                    </option>
+                {% endfor %}
+            </select>
+            <span class="field__help" id="journalists-help">Hold <strong>Ctrl</strong> (or <strong>Cmd</strong> on Apple Macs) to bind multiple reporters to this workspace.</span>
+            {% if form.journalists.errors %}
+                <div class="field__error" role="alert">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ form.journalists.errors.0 }}
+                </div>
+            {% endif %}
+        </div>
+        </section>
+
+        <!-- Standard Form Navigation Buttons Layout -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                {% if action == 'Create' %}Provision Publisher Workspace{% else %}Save Configuration Changes{% endif %}
+            </button>
+            <a href="{% if instance %}{% url 'news:publisher_detail' instance.pk %}{% else %}{% url 'news:publisher_list' %}{% endif %}" class="btn btn--ghost">Cancel</a>
+        </div>
+    </form>
+    </div>
+</div>
+{% endblock %}

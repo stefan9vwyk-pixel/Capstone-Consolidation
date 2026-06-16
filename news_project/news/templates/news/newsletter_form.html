@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Newsletter — Newsroom{% endblock %}
+{% block topbar_title %}{{ action }} Newsletter{% endblock %}
+
+{% block content %}
+<div class="article-form-wrap">
+  
+  <!-- Breadcrumb Directory Route Map -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'news:newsletter_list' %}" class="breadcrumb__link">Newsletters</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    {% if newsletter %}
+      <a href="{% url 'news:newsletter_detail' newsletter.pk %}" class="breadcrumb__link">{{ newsletter.title|truncatechars:20 }}</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    {% endif %}
+    <span class="breadcrumb__current" aria-current="page">{{ action }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">{{ action }} Newsletter</h1>
+      <p class="page-subtitle">
+        {% if action == 'Create' %}Curate a clean collection of verified and approved articles for distribution.{% else %}Update this newsletter's title, description summary, or managed article selections.{% endif %}
+      </p>
+    </div>
+    <div class="page-header__actions">
+      <a href="{% if newsletter %}{% url 'news:newsletter_detail' newsletter.pk %}{% else %}{% url 'news:newsletter_list' %}{% endif %}" class="btn btn--ghost btn--sm">Cancel</a>
+    </div>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert--danger" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <!-- Section 1: Distribution Specifications -->
+    <section class="form-section">
+      <h2 class="form-section__title">Newsletter Volume Details</h2>
+
+      <div class="field">
+        <label for="id_title">Title Headline <span class="field__label-required" aria-hidden="true">*</span></label>
+        <input type="text" name="title" id="id_title"
+          class="input{% if form.title.errors %} input--error{% endif %}"
+          value="{{ form.title.value|default:'' }}"
+          placeholder="e.g. Weekly Technology Digest"
+          required aria-describedby="{% if form.title.errors %}title-err{% endif %}">
+        {% if form.title.errors %}
+          <div class="field__error" id="title-err" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.title.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_description">Brief Description Summary</label>
+        <textarea name="description" id="id_description"
+          class="input{% if form.description.errors %} input--error{% endif %}"
+          style="min-height: 90px;"
+          placeholder="Enter a brief contextual overview detailing what topics this edition addresses…">{{ form.description.value|default:'' }}</textarea>
+        {% if form.description.errors %}
+          <div class="field__error" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.description.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Section 2: Aggregated Article Lists Selection -->
+    <section class="form-section">
+      <h2 class="form-section__title">Article Index Inclusions</h2>
+      <p style="font-size: 13px; color: var(--text-sec); margin-bottom: var(--sp-sm);">Only database records tracking a validated approved state populate this layout frame.</p>
+
+      <div class="field">
+        <label for="id_articles">Select Stories to Bundle</label>
+        <select name="articles" id="id_articles" class="input input--multiselect" multiple aria-describedby="articles-help">
+          {% for article in form.articles.field.queryset %}
+            <option value="{{ article.pk }}"
+              {% if article in form.articles.initial or article.pk|stringformat:"s" in form.articles.value %}selected{% endif %}>
+              {{ article.title }} — by {{ article.author.get_full_name|default:article.author.username }} ({{ article.created_at|date:"M j" }})
+            </option>
+          {% endfor %}
+        </select>
+        <span class="field__help" id="articles-help">Hold the <strong>Ctrl key</strong> (or <strong>Cmd key</strong> on Apple macOS devices) to highlight several target options.</span>
+        {% if form.articles.errors %}
+          <div class="field__error" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.articles.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        {% if action == 'Create' %}Publish Newsletter Volume{% else %}Save Changes{% endif %}
+      </button>
+      <a href="{% if newsletter %}{% url 'news:newsletter_detail' newsletter.pk %}{% else %}{% url 'news:newsletter_list' %}{% endif %}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

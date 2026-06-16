@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Review: {{ article.title }} — Newsroom{% endblock %}
+{% block topbar_title %}Review Article{% endblock %}
+
+{% block content %}
+<div class="breadcrumb" aria-label="Breadcrumb">
+  <a href="{% url 'news:article_approval_queue' %}" class="breadcrumb__link">Approval Queue</a>
+  <span class="breadcrumb__sep" aria-hidden="true">/</span>
+  <span class="breadcrumb__current">{{ article.title|truncatechars:40 }}</span>
+</div>
+
+<div class="approve-layout">
+  <!-- Article content card -->
+  <div>
+    <div class="approve-card">
+      <div class="approve-card__header">
+        <div class="approve-card__meta-row">
+          <span class="badge badge--warning">Pending Review</span>
+          <span class="approve-card__date">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Submitted {{ article.created_at|date:"F j, Y" }}
+          </span>
+        </div>
+        <h1 class="approve-card__title">{{ article.title }}</h1>
+        <div class="approve-card__byline">
+          <div class="approve-card__author">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ article.author.get_full_name|default:article.author.username }}
+          </div>
+          {% if article.publisher %}
+          <span class="approve-card__sep" aria-hidden="true">·</span>
+          <div class="approve-card__publisher">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+            {{ article.publisher.name }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="approve-card__body">
+        <div class="approve-card__content-preview">{{ article.content|truncatechars:1200 }}</div>
+        {% if article.content|length > 1200 %}
+          <p class="approve-card__truncate-note" style="margin-top:12px">
+            — Preview truncated. <a href="{% url 'news:article_detail' article.pk %}" style="color:var(--accent)">Read full article →</a>
+          </p>
+        {% endif %}
+      </div>
+      <div class="approve-card__footer">
+        <div class="approve-card__stats">
+          <span class="stat-chip">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+            {{ article.word_count }} words
+          </span>
+          <a href="{% url 'news:article_detail' article.pk %}" class="stat-chip stat-chip--link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View full article
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decision panel -->
+  <aside class="approve-panel" aria-label="Approval decision">
+    <div class="info-box">
+      <div class="info-box__header" style="font-weight:600;color:var(--text)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Make a Decision
+      </div>
+      <p style="font-size:13px;color:var(--text-sec);margin-bottom:12px;line-height:1.5">
+        Approving will publish this article and notify subscribers by email.
+      </p>
+      <form method="post" action="{% url 'news:article_approve' article.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="queue">
+        <button type="submit" class="btn btn--success btn--full" style="margin-bottom:8px">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Approve & Publish
+        </button>
+      </form>
+      <a href="{% url 'news:article_approval_queue' %}" class="btn btn--ghost btn--full">← Back to queue</a>
+    </div>
+
+    <div class="approve-panel__divider">What happens</div>
+
+    <div class="info-box">
+      <ul class="info-box__list">
+        <li>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/></svg>
+          Article is marked <code>approved = True</code>
+        </li>
+        <li>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Subscribers receive email notification
+        </li>
+        <li>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          Webhook POST to <code>/api/approved/</code>
+        </li>
+        <li>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Article becomes visible to readers
+        </li>
+      </ul>
+    </div>
+
+    {% if article.author.email %}
+    <div class="author-contact">
+      <div class="author-contact__label">Contact author</div>
+      <a href="mailto:{{ article.author.email }}" class="author-contact__link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        {{ article.author.email }}
+      </a>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

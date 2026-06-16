@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="article-detail" style="margin: 0 auto;">
+    <header class="page-header">
+        <div>
+            <h1 class="page-title">Account Settings</h1>
+            <p class="page-subtitle">Update your personal information and public profile.</p>
+        </div>
+    </header>
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="alert alert--danger" role="alert">
+                {{ form.non_field_errors.0 }}
+            </div>
+        {% endif %}
+
+        <section class="form-section">
+            <h2 class="form-section__title">Personal Information</h2>
+            
+            <div class="form-grid">
+                <!-- First Name -->
+                <div class="field">
+                    <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                    <input type="text" name="{{ form.first_name.html_name }}" id="{{ form.first_name.id_for_label }}" 
+                           class="input{% if form.first_name.errors %} input--error{% endif %}" 
+                           value="{{ form.first_name.value|default:'' }}">
+                    {% if form.first_name.errors %}
+                        <div class="field__error">{{ form.first_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- Last Name -->
+                <div class="field">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                    <input type="text" name="{{ form.last_name.html_name }}" id="{{ form.last_name.id_for_label }}" 
+                           class="input{% if form.last_name.errors %} input--error{% endif %}" 
+                           value="{{ form.last_name.value|default:'' }}">
+                    {% if form.last_name.errors %}
+                        <div class="field__error">{{ form.last_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+                <label for="{{ form.email.id_for_label }}">Email Address</label>
+                <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}" 
+                       class="input{% if form.email.errors %} input--error{% endif %}" 
+                       value="{{ form.email.value|default:'' }}">
+                <span class="field__help">Used for notifications and login.</span>
+                {% if form.email.errors %}
+                    <div class="field__error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2 class="form-section__title">Public Profile Settings</h2>
+
+            <!-- Avatar URL -->
+            <div class="field">
+                <label for="{{ form.avatar_url.id_for_label }}">Avatar URL</label>
+                <input type="url" name="{{ form.avatar_url.html_name }}" id="{{ form.avatar_url.id_for_label }}" 
+                       class="input{% if form.avatar_url.errors %} input--error{% endif %}" 
+                       value="{{ form.avatar_url.value|default:'' }}">
+                {% if form.avatar_url.errors %}
+                    <div class="field__error">{{ form.avatar_url.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Bio -->
+            <div class="field">
+                <label for="{{ form.bio.id_for_label }}">Biography</label>
+                <textarea name="{{ form.bio.html_name }}" id="{{ form.bio.id_for_label }}" 
+                          class="input{% if form.bio.errors %} input--error{% endif %}">{{ form.bio.value|default:'' }}</textarea>
+                {% if form.bio.errors %}
+                    <div class="field__error">{{ form.bio.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Update Profile</button>
+            <a href="{% url 'news:dashboard' %}" class="btn btn--ghost">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

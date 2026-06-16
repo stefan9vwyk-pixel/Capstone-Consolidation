@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% block title %}Articles — Newsroom{% endblock %}
+{% block topbar_title %}Articles{% endblock %}
+
+{% block topbar_actions %}
+    {% if request.user.can_create_content %}
+    <a href="{% url 'news:article_create' %}" class="btn btn--primary btn--sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Article
+    </a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="user-detail-container">
+  
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Articles</h1>
+      <p class="page-subtitle">{{ total_count }} article{{ total_count|pluralize }} indexed in the newsroom</p>
+    </div>
+  </header>
+
+  <!-- Filter & Query Actions Bar Component -->
+  <div class="table-toolbar">
+    <form method="get" action="{% url 'news:article_list' %}" role="search" class="table-toolbar__form">
+      <div class="search-wrapper">
+        <svg class="search-wrapper__icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          name="q"
+          value="{{ current_q|default:'' }}"
+          placeholder="Search articles..."
+          class="input input--search"
+          aria-label="Search articles"
+        >
+      </div>
+
+      <select name="status" class="input table-toolbar__select" aria-label="Filter by status" onchange="this.form.submit()">
+        <option value="">All Statuses</option>
+        <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Approved</option>
+        <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending Review</option>
+      </select>
+
+      <select name="publisher" class="input table-toolbar__select" aria-label="Filter by publisher" onchange="this.form.submit()">
+        <option value="">All Publishers</option>
+        <option value="independent" {% if current_publisher == 'independent' %}selected{% endif %}>Independent</option>
+        {% for pub in publishers %}
+          <option value="{{ pub.pk }}" {% if current_publisher == pub.pk|stringformat:"s" %}selected{% endif %}>{{ pub.name }}</option>
+        {% endfor %}
+      </select>
+
+      <div class="table-toolbar__actions">
+        <button type="submit" class="btn btn--ghost btn--sm">Apply Filters</button>
+        {% if current_q or current_status or current_publisher %}
+          <a href="{% url 'news:article_list' %}" class="btn btn--ghost btn--sm" style="color: var(--danger); border-color: rgba(214,69,69,0.15);">Clear</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Data Display Grid Table Module -->
+  <div class="table-wrapper">
+    <table class="data-table" aria-label="Newsroom catalog archives">
+      <thead>
+        <tr>
+          <th scope="col" class="col-title">Title</th>
+          <th scope="col" class="col-meta">Author</th>
+          <th scope="col" class="col-meta">Publisher</th>
+          <th scope="col" class="col-meta">Status</th>
+          <th scope="col" class="col-date">Date</th>
+          <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for article in page_obj %}
+        <tr>
+          <td>
+            <a href="{% url 'news:article_detail' article.pk %}" style="font-weight: 500; color: var(--text);">{{ article.title }}</a>
+          </td>
+          <td style="color: var(--text-sec);">{{ article.author.get_full_name|default:article.author.username }}</td>
+          <td style="color: var(--text-sec);">{{ article.publisher.name|default:"Independent" }}</td>
+          <td>
+            <span class="badge {% if article.approved %}badge--success{% else %}badge--warning{% endif %}">
+              {{ article.get_status_label }}
+            </span>
+          </td>
+          <td style="color: var(--text-sec);">{{ article.created_at|date:"M d, Y" }}</td>
+          <td class="col-actions">
+            <a href="{% url 'news:article_detail' article.pk %}" class="btn btn--ghost btn--sm">View</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="padding: 0;">
+            <div class="empty-state">
+              <div class="empty-state__icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                </svg>
+              </div>
+              <h2 class="empty-state__title">No articles found</h2>
+              <p class="empty-state__body">
+                {% if current_q or current_status or current_publisher %}
+                  No entries match your target query fields. Try adjusting your metadata tokens.
+                {% else %}
+                  There are no current content elements indexed inside this database instance yet.
+                {% endif %}
+              </p>
+              {% if request.user.can_create_content %}
+                <a href="{% url 'news:article_create' %}" class="btn btn--primary btn--sm">Create New Article</a>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Table Pagination Footer Area -->
+    {% if page_obj.has_other_pages %}
+    <footer class="pagination-wrapper" role="navigation" aria-label="Table pagination footer navigation">
+      <div class="pagination-wrapper__info">
+        Showing entries <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of {{ total_count }} rows
+      </div>
+      <div class="pagination" style="border-top: none; padding: 0;">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if current_q %}&q={{ current_q }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_publisher %}&publisher={{ current_publisher }}{% endif %}" class="pagination__btn">
+            &laquo; Prev
+          </a>
+        {% endif %}
+
+        {% for i in page_range %}
+          {% if page_obj.number == i %}
+            <span class="pagination__page pagination__page--current">{{ i }}</span>
+          {% elif i == page_obj.paginator.ELLIPSIS %}
+            <span class="pagination__ellipsis">...</span>
+          {% else %}
+            <a href="?page={{ i }}{% if current_q %}&q={{ current_q }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_publisher %}&publisher={{ current_publisher }}{% endif %}" class="pagination__page">{{ i }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if current_q %}&q={{ current_q }}{% endif %}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_publisher %}&publisher={{ current_publisher }}{% endif %}" class="pagination__btn">
+            Next &raquo;
+          </a>
+        {% endif %}
+      </div>
+    </footer>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

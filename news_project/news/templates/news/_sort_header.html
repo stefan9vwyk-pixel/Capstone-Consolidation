@@ -1,0 +1,43 @@
+{% comment %}
+  Params: label, field, current_sort, current_order, filter_query_string
+{% endcomment %}
+{% if current_sort == field %}
+  {% if current_order == 'asc' %}
+    {% with next_order="desc" %}
+    <a href="?sort={{ field }}&order={{ next_order }}&{{ filter_query_string }}"
+       class="flex items-center gap-xs sort-active sortable"
+       style="color:var(--accent);text-decoration:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em"
+       aria-label="Sort by {{ label }}, currently ascending, click for descending">
+      {{ label }}
+      <span class="sort-indicator" aria-hidden="true">
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor"><path d="M4 0L8 5H0z"/></svg>
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor" style="opacity:0.3"><path d="M4 5L0 0h8z"/></svg>
+      </span>
+    </a>
+    {% endwith %}
+  {% else %}
+    {% with next_order="asc" %}
+    <a href="?sort={{ field }}&order={{ next_order }}&{{ filter_query_string }}"
+       class="flex items-center gap-xs sort-active sortable"
+       style="color:var(--accent);text-decoration:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em"
+       aria-label="Sort by {{ label }}, currently descending, click for ascending">
+      {{ label }}
+      <span class="sort-indicator" aria-hidden="true">
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor" style="opacity:0.3"><path d="M4 0L8 5H0z"/></svg>
+        <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor"><path d="M4 5L0 0h8z"/></svg>
+      </span>
+    </a>
+    {% endwith %}
+  {% endif %}
+{% else %}
+  <a href="?sort={{ field }}&order=desc&{{ filter_query_string }}"
+     class="flex items-center gap-xs sortable"
+     style="color:var(--text-sec);text-decoration:none;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em"
+     aria-label="Sort by {{ label }}">
+    {{ label }}
+    <span class="sort-indicator" aria-hidden="true">
+      <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor"><path d="M4 0L8 5H0z"/></svg>
+      <svg width="8" height="5" viewBox="0 0 8 5" fill="currentColor"><path d="M4 5L0 0h8z"/></svg>
+    </span>
+  </a>
+{% endif %}

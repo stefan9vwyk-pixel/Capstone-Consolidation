@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Publishers — Newsroom{% endblock %}
+{% block topbar_title %}Publishers{% endblock %}
+
+{% block topbar_actions %}
+  {% if user.is_authenticated and user.is_editor %}
+      <a href="{% url 'news:publisher_create' %}" class="btn btn--primary btn--sm">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Publisher
+      </a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="user-detail-container">
+
+  <header class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--sp-md, 2rem);">
+    <div>
+      <h1 class="page-title">Publishers</h1>
+      <p class="page-subtitle">{{ publishers.count }} publishing agency network node{{ publishers.count|pluralize }} mapped in system</p>
+    </div>
+  </header>
+
+  <!-- Component Card Listing Grid Wrapper -->
+  {% if publishers %}
+    <div class="pb-grid">
+      {% for pub in publishers %}
+      <article class="pub-card" aria-labelledby="pub-title-{{ pub.pk }}">
+        <div class="pub-card__header">
+          <div class="pub-card__initial" aria-hidden="true">{{ pub.name|first|upper }}</div>
+          <div class="pub-card__identity">
+            <h2 id="pub-title-{{ pub.pk }}" class="pub-card__name">
+              <a href="{% url 'news:publisher_detail' pub.pk %}">{{ pub.name }}</a>
+            </h2>
+            {% if pub.website %}
+              <a href="{{ pub.website }}" target="_blank" rel="noopener noreferrer" class="pub-card__website" aria-label="{{ pub.name }} website (opens in new tab)">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>{{ pub.website|truncatechars:30 }}</span>
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if pub.description %}
+          <p class="pub-card__desc">{{ pub.description|truncatewords:18 }}</p>
+        {% endif %}
+
+        <!-- Internal Performance Metric Rows -->
+        <div class="pub-card__stats">
+          <div class="pub-stat">
+            <span class="pub-stat__value">{{ pub.total_articles_count|default:0 }}</span>
+            <span class="pub-stat__label">Articles</span>
+          </div>
+          <div class="pub-stat">
+            <span class="pub-stat__value">{{ pub.journalists.count }}</span>
+            <span class="pub-stat__label">Journalists</span>
+          </div>
+          <div class="pub-stat">
+            <span class="pub-stat__value">{{ pub.editors.count }}</span>
+            <span class="pub-stat__label">Editors</span>
+          </div>
+        </div>
+
+        <!-- Action Control Group Footer Bar -->
+        <div class="pub-card__actions-group">
+          <a href="{% url 'news:publisher_detail' pub.pk %}" class="btn btn--ghost btn--sm btn--full">View Network</a>
+          {% if user.can_create_content and user.is_editor %}
+            <a href="{% url 'news:publisher_edit' pub.pk %}" class="btn btn--ghost btn--sm btn--full" aria-label="Edit {{ pub.title }}">Edit</a>
+          {% endif %}
+          {% if user.is_authenticated and user.is_reader %}
+            <form action="{% url 'accounts:toggle_subscription' 'publisher' pub.pk %}" method="POST" class="pub-card__form">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--sm btn--full {% if pub in user.subscribed_publishers.all %}btn--secondary{% else %}btn--primary{% endif %}">
+                {% if pub in user.subscribed_publishers.all %}Unsubscribe{% else %}Subscribe{% endif %}
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state" style="border: 1px solid var(--border); border-radius: var(--radius-sm);">
+      <div class="empty-state__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      </div>
+      <h2 class="empty-state__title">No publishers tracked</h2>
+      <p class="empty-state__body">Publishers must be initialized by administrators inside the console. Run <code class="ic">python setup.py</code> to automatically populate demo datasets.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

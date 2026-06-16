@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="user-detail-container">
+
+  <!-- Breadcrumb Roadmap Navigation Map -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'news:article_list' %}" class="breadcrumb__link">Articles</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <span class="breadcrumb__current" aria-current="page">{{ article.title|truncatechars:35 }}</span>
+  </nav>
+
+  <!-- Split Detail Grid Layout Frame -->
+  <div class="article-layout">
+    
+    <!-- Primary Editorial Reading Column -->
+    <main class="article-layout__body-column">
+      <header class="article-detail__header">
+        <div class="badge-list" style="margin-bottom: var(--sp-md);">
+          <span class="badge badge--success">
+            {{ article.get_status_label }}
+          </span>
+          {% if article.publisher %}
+            <a href="{% url 'news:publisher_detail' article.publisher.pk %}" class="badge badge--neutral">{{ article.publisher.name }}</a>
+          {% else %}
+            <span class="badge badge--neutral">Independent Content</span>
+          {% endif %}
+          {% if article.newsletters.exists %}
+            <span class="badge badge--accent">
+              In {{ article.newsletters.count }} Newsletter{{ article.newsletters.count|pluralize }}
+            </span>
+          {% endif %}
+        </div>
+
+        <h1 class="article-detail__title">{{ article.title }}</h1>
+
+        <div class="article-byline">
+          <div class="article-byline__author-meta">
+            <span class="article-byline__name">{{ article.author.get_full_name|default:article.author.username }}</span>
+            <span class="badge {% if article.author.is_editor %}badge--success{% else %}badge--accent{% endif %}">{{ article.author.get_role_display }}</span>
+          </div>
+          <time class="article-byline__date" datetime="{{ article.created_at|date:'Y-m-d' }}">
+            {{ article.created_at|date:"F j, Y" }}
+            {% if article.updated_at != article.created_at %}
+              <span class="article-byline__updated">· Updated {{ article.updated_at|date:"M d, Y" }}</span>
+            {% endif %}
+          </time>
+        </div>
+      </header>
+
+      <!-- Clean Typographic Article Reading Window -->
+      <section class="article-detail__body" aria-label="Article content body">
+        {{ article.content|linebreaks }}
+      </section>
+
+      <footer class="article-actions" style="margin-top: var(--sp-xl); border-top: 1px solid var(--border); padding-top: var(--sp-md);">
+        <div style="font-size: 13px; color: var(--text-sec);">
+          <strong>Metrics:</strong> {{ article.word_count }} words compiled in database.
+        </div>
+      </footer>
+    </main>
+
+    <!-- Side Action Utility Column Panel Grid -->
+    <aside class="article-layout__sidebar-column">
+      <div class="approve-panel">
+        
+        <div class="info-box">
+          <h2 class="info-box__header" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; color: var(--text-sec); margin-bottom: var(--sp-md);">
+            Controls
+          </h2>
+          
+          <div style="display: flex; flex-direction: column; gap: var(--sp-sm);">
+            {% if user.is_authenticated and user.is_reader %}
+              <form action="{% url 'accounts:toggle_subscription' 'journalist' article.author.id %}" method="POST" style="display: flex; flex-direction: column;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if article.author in user.subscribed_journalists.all %}btn--secondary{% else %}btn--primary{% endif %}">
+                  {% if article.author in user.subscribed_journalists.all %}
+                    Unfollow {{ article.author.first_name }}
+                  {% else %}
+                    Follow {{ article.author.first_name }}
+                  {% endif %}
+                </button>
+              </form>
+            {% endif %}
+
+            {% if can_edit %}
+              <a href="{% url 'news:article_edit' article.pk %}" class="btn btn--ghost">
+                Edit Story Fields
+              </a>
+            {% endif %}
+
+            {% if can_approve %}
+              <form method="post" action="{% url 'news:article_approve' article.pk %}" style="display: flex; flex-direction: column;">
+                {% csrf_token %}
+                <button type="submit" class="btn {% if article.approved %}btn--danger{% else %}btn--success{% endif %}">
+                  {% if article.approved %}Revoke Approval{% else %}Approve Publication{% endif %}
+                </button>
+              </form>
+            {% endif %}
+
+            {% if can_delete %}
+              <a href="{% url 'news:article_delete' article.pk %}" class="btn btn--ghost" style="color: var(--danger); border-color: rgba(214,69,69,0.2);">
+                Delete Article Entry
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Featured Newsletters Module Card -->
+        {% if article.newsletters.exists %}
+        <div class="info-box">
+          <h2 class="info-box__header" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; color: var(--text-sec); margin-bottom: var(--sp-sm);">
+            Featured Distribution
+          </h2>
+          <ul class="info-box__list">
+            {% for nl in article.newsletters.all %}
+              <li style="border-bottom: 1px dashed var(--border); padding-bottom: var(--sp-xs); width: 100%; display: block;">
+                <a href="{% url 'news:newsletter_detail' nl.pk %}" class="meta-link" style="font-weight: 500; font-size: 13px;">{{ nl.title }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+{% endblock %}

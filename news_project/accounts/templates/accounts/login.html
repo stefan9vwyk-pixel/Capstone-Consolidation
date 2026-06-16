@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Sign In — Newsroom{% endblock %}
+
+{% block auth_content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <header class="auth-card__header">
+      <div class="auth-card__brand">
+        <div class="auth-card__brand-mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8M15 18h-5M10 6h8v4h-8z"/></svg>
+        </div>
+        <span class="auth-card__brand-name">Newsroom</span>
+      </div>
+
+      <h1 class="auth-card__title">Welcome back</h1>
+      <p class="auth-card__subtitle">Sign in to your account to continue</p>
+    </header>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert--danger" role="alert">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          {{ form.non_field_errors.0 }}
+        </div>
+      {% endif %}
+
+      <div class="field">
+        <label for="id_username">Username</label>
+        <input
+          type="text" name="username" id="id_username"
+          class="input{% if form.username.errors %} input--error{% endif %}"
+          autocomplete="username" autocapitalize="none"
+          value="{{ form.username.value|default:'' }}"
+          aria-describedby="{% if form.username.errors %}username-error{% endif %}"
+          required>
+        {% if form.username.errors %}
+          <div class="field__error" id="username-error" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.username.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="id_password">Password</label>
+        <input
+          type="password" name="password" id="id_password"
+          class="input{% if form.password.errors %} input--error{% endif %}"
+          autocomplete="current-password"
+          aria-describedby="{% if form.password.errors %}password-error{% endif %}"
+          required>
+        {% if form.password.errors %}
+          <div class="field__error" id="password-error" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.password.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-actions" style="padding-top: var(--sp-xs);">
+        <button type="submit" class="btn btn--lg btn--full btn--primary">Sign in</button>
+      </div>
+    </form>
+
+    <footer class="auth-card__footer">
+      <p>
+        Don't have an account? 
+        <a href="{% url 'accounts:register' %}">Create one</a>
+      </p>
+    </footer>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Article — Newsroom{% endblock %}
+{% block topbar_title %}{{ action }} Article{% endblock %}
+
+{% block content %}
+<div class="article-form-wrap">
+  
+  <!-- Breadcrumb Directory Route Map -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'news:article_list' %}" class="breadcrumb__link">Articles</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    {% if article %}
+      <a href="{% url 'news:article_detail' article.pk %}" class="breadcrumb__link">{{ article.title|truncatechars:20 }}</a>
+      <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    {% endif %}
+    <span class="breadcrumb__current" aria-current="page">{{ action }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">{{ action }} Article</h1>
+      <p class="page-subtitle">
+        {% if action == 'Create' %}Compose a new news report. It will be pushed directly to the editor approval desk queue.{% else %}Modify existing article body content and source metadata tags.{% endif %}
+      </p>
+    </div>
+    <div class="page-header__actions">
+      <a href="{% if article %}{% url 'news:article_detail' article.pk %}{% else %}{% url 'news:article_list' %}{% endif %}" class="btn btn--ghost">Cancel</a>
+    </div>
+  </header>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert--danger" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <!-- Core Content Body Card Segment -->
+    <section class="form-section">
+      <h2 class="form-section__title">Article Body & Elements</h2>
+
+      <div class="field">
+        <label for="id_title">Story Headline <span class="field__label-required" aria-hidden="true">*</span></label>
+        <input type="text" name="title" id="id_title"
+          class="input{% if form.title.errors %} input--error{% endif %}"
+          value="{{ form.title.value|default:'' }}"
+          placeholder="Enter a compelling article title…"
+          aria-describedby="{% if form.title.errors %}title-err{% endif %} title-help"
+          required>
+        {% if form.title.errors %}
+          <div class="field__error" id="title-err" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.title.errors.0 }}
+          </div>
+        {% endif %}
+        <span class="field__help" id="title-help">Minimum 5 characters required for validation index bounds.</span>
+      </div>
+
+      <div class="field">
+        <label for="id_content">Content Body <span class="field__label-required" aria-hidden="true">*</span></label>
+        <textarea name="content" id="id_content"
+          class="input{% if form.content.errors %} input--error{% endif %} input--editorial-body"
+          placeholder="Write your article copy here…"
+          aria-describedby="{% if form.content.errors %}content-err{% endif %}"
+          required>{{ form.content.value|default:'' }}</textarea>
+        {% if form.content.errors %}
+          <div class="field__error" id="content-err" role="alert">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {{ form.content.errors.0 }}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- Source Agency Association Metadata Card -->
+    <section class="form-section">
+      <h2 class="form-section__title">Distribution Scope</h2>
+
+      <div class="field">
+        <label for="id_publisher">Associated Agency Network</label>
+        <select name="publisher" id="id_publisher" class="input" aria-describedby="publisher-help">
+          <option value="">Independent Content (No Agency Link)</option>
+          {% for pub in form.publisher.field.queryset %}
+            <option value="{{ pub.pk }}" {% if form.publisher.value|stringformat:"s" == pub.pk|stringformat:"s" %}selected{% endif %}>{{ pub.name }}</option>
+          {% endfor %}
+        </select>
+        <span class="field__help" id="publisher-help">Leave clear if you wish to run as an independent entry or freelance pitch.</span>
+      </div>
+    </section>
+
+    <!-- Content Submission Toolbar -->
+    <div class="form-actions">
+      <button type="submit" class="btn btn--primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        {% if action == 'Create' %}Submit for Review{% else %}Save Changes{% endif %}
+      </button>
+      <a href="{% if article %}{% url 'news:article_detail' article.pk %}{% else %}{% url 'news:article_list' %}{% endif %}" class="btn btn--ghost">Cancel</a>
+      
+      {% if action == 'Create' %}
+        <p class="form-actions__note">
+          Draft submissions require manual verification before syndication feeds process.
+        </p>
+      {% endif %}
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Dynamic live client word metric analyzer hook
+(function() {
+  const textWindow = document.getElementById('id_content');
+  if (!textWindow) return;
+  
+  const metricBox = document.createElement('div');
+  metricBox.className = 'word-counter';
+  textWindow.parentNode.insertBefore(metricBox, textWindow.nextSibling);
+  
+  function recalculateMetrics() {
+    const totalWords = textWindow.value.trim().split(/\s+/).filter(Boolean).length;
+    metricBox.textContent = `${totalWords} word${totalWords !== 1 ? 's' : ''} typed`;
+  }
+  
+  textWindow.addEventListener('input', recalculateMetrics);
+  recalculateMetrics();
+})();
+</script>
+{% endblock %}

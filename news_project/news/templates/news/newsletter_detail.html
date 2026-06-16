@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ newsletter.title }} — Newsroom{% endblock %}
+{% block topbar_title %}Newsletter{% endblock %}
+
+{% block topbar_actions %}
+  <div class="page-header__actions">
+    {% if can_edit %}
+      <a href="{% url 'news:newsletter_edit' newsletter.pk %}" class="btn btn--ghost btn--sm">Edit Distribution</a>
+    {% endif %}
+    {% if can_delete %}
+      <a href="{% url 'news:newsletter_delete' newsletter.pk %}" class="btn btn--danger btn--sm">Delete Edition</a>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block content %}
+<div class="user-detail-container">
+
+  <!-- Breadcrumb Directory Mapping -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'news:newsletter_list' %}" class="breadcrumb__link">Newsletters</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <span class="breadcrumb__current" aria-current="page">{{ newsletter.title|truncatechars:35 }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div class="page-header__main">
+      <div class="newsletter-header-badge-wrap">
+        <div class="newsletter-header-badge-wrap__icon-container" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <span class="badge badge--accent">{{ newsletter.articles.count }} article{{ newsletter.articles.count|pluralize }} bundled</span>
+      </div>
+      
+      <h1 class="page-title">{{ newsletter.title }}</h1>
+      {% if newsletter.description %}
+        <p class="page-subtitle">{{ newsletter.description }}</p>
+      {% endif %}
+      
+      <div class="article-byline" style="border: none; padding: 0; margin-top: var(--sp-sm); margin-bottom: 0;">
+        <p class="page-subtitle" style="color: var(--text-sec); font-size: 13px;">
+          By <strong>{{ newsletter.author.get_full_name|default:newsletter.author.username }}</strong> 
+          · Issued on <time datetime="{{ newsletter.created_at|date:'Y-m-d' }}">{{ newsletter.created_at|date:"F j, Y" }}</time>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mapped Articles Catalog List -->
+  {% if newsletter.articles.exists %}
+    <div class="table-wrapper">
+      <table class="data-table" aria-label="Articles aggregated inside this edition context">
+        <thead>
+          <tr>
+            <th scope="col" class="col-title">Article Specification</th>
+            <th scope="col" class="col-meta">Author</th>
+            <th scope="col" class="col-meta">Publisher Network</th>
+            <th scope="col" class="col-words">Words</th>
+            <th scope="col" class="col-date">Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for article in newsletter.articles.all %}
+          <tr>
+            <td class="col-title">
+              <a href="{% url 'news:article_detail' article.pk %}" class="queue-row__title-link">{{ article.title }}</a>
+              <div class="queue-row__snippet">{{ article.content|truncatewords:12 }}</div>
+            </td>
+            <td class="col-meta">
+              <span class="meta-name">{{ article.author.get_full_name|default:article.author.username }}</span>
+            </td>
+            <td class="col-meta">
+              {% if article.publisher %}
+                <a href="{% url 'news:publisher_detail' article.publisher.pk %}" class="meta-link">{{ article.publisher.name }}</a>
+              {% else %}
+                <span class="meta-empty">Independent Entry</span>
+              {% endif %}
+            </td>
+            <td class="col-words" style="color: var(--text-sec); font-size: 13px;">{{ article.word_count }}</td>
+            <td class="col-date" style="color: var(--text-sec); font-size: 13px;">
+              <time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:"M j, Y" }}</time>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state" style="border: 1px solid var(--border); border-radius: var(--radius-sm);">
+      <div class="empty-state__icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <h2 class="empty-state__title">No articles assigned yet</h2>
+      <p class="empty-state__body">This newsletter composition volume is currently empty. Edit the record properties to append approved stories.</p>
+      {% if can_edit %}
+        <a href="{% url 'news:newsletter_edit' newsletter.pk %}" class="btn btn--primary btn--sm">Add Articles Now</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

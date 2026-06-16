@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Our Journalists{% endblock %}
+
+{% block content %}
+<header class="page-header">
+    <div>
+        <h1 class="page-title">Our Journalists</h1>
+        <p class="page-subtitle">Follow your favourite writers to see their latest stories on your dashboard.</p>
+    </div>
+</header>
+
+<div class="journalist-grid">
+    {% for journalist in journalists %}
+    <article class="journalist-card">
+        <div class="journalist-card__profile">
+            <div class="user-avatar">
+                {% if journalist.avatar_url %}
+                    <img src="{{ journalist.avatar_url }}" alt="{{ journalist.get_full_name|default:journalist.username }}">
+                {% else %}
+                    {{ journalist.first_name|first|upper }}{{ journalist.last_name|first|upper }}
+                {% endif %}
+            </div>
+            <div class="journalist-card__identity">
+                <h3 class="journalist-card__name">{{ journalist.get_full_name|default:journalist.username }}</h3>
+                <p class="journalist-card__stats">{{ journalist.articles.count }} Articles Published</p>
+            </div>
+        </div>
+
+        <p class="journalist-card__bio">
+            "{{ journalist.bio|truncatewords:20|default:"No bio available." }}"
+        </p>
+
+        <div class="journalist-card__actions">
+            <a href="{% url 'accounts:journalist_public_profile' journalist.pk %}" class="btn btn--ghost btn--sm">View Profile</a>
+
+            {% if user.is_authenticated and user.is_reader %}
+            <form action="{% url 'accounts:toggle_subscription' 'journalist' journalist.id %}" method="POST" class="journalist-card__form">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--sm btn--full {% if journalist in user.subscribed_journalists.all %}btn--ghost{% else %}btn--primary{% endif %}">
+                    {% if journalist in user.subscribed_journalists.all %}
+                        Unsubscribe
+                    {% else %}
+                        Subscribe
+                    {% endif %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </article>
+    {% empty %}
+    <div class="empty-state">
+        <div class="empty-state__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        </div>
+        <h2 class="empty-state__title">No journalists found</h2>
+        <p class="empty-state__body">There are currently no staff writers or reporters registered in the newsroom.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

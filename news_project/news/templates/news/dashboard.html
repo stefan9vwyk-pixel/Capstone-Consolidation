@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Newsroom{% endblock %}
+{% block topbar_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+  {% if user.can_create_content %}
+    <a href="{% url 'news:article_create' %}" class="btn btn--primary btn--sm">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      New Article
+    </a>
+  {% endif %}
+  {% if user.is_authenticated %}
+    <a href="{% url 'accounts:profile' %}" class="btn btn--primary btn--sm">Edit Profile</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="user-detail-container">
+
+  <header class="page-header">
+    <div class="page-header__main">
+      <h1 class="page-title">Good {% now "G" as hour %}{% if hour < 12 %}morning{% elif hour < 17 %}afternoon{% else %}evening{% endif %}, {{ user.get_full_name|default:user.username }}</h1>
+      <p class="page-subtitle">Here's a comprehensive look at the newsroom activity indexes today.</p>
+    </div>
+  </header>
+
+  <!-- Platform System Performance Stats Strip Module -->
+  <section class="stats-strip" role="region" aria-label="Newsroom dashboard tracking performance">
+    <div class="stat-item">
+      <span class="stat-item__value">{{ stats.total_articles }}</span>
+      <span class="stat-item__label">Total Articles</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-item__value stat-item__value--success">{{ stats.approved_articles }}</span>
+      <span class="stat-item__label">Published</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-item__value stat-item__value--muted">{{ stats.pending_articles }}</span>
+      <span class="stat-item__label">Pending Review</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-item__value">{{ stats.total_newsletters }}</span>
+      <span class="stat-item__label">Newsletters</span>
+    </div>
+    <div class="stat-divider" aria-hidden="true"></div>
+    <div class="stat-item">
+      <span class="stat-item__value">{{ stats.total_publishers }}</span>
+      <span class="stat-item__label">Publishers</span>
+    </div>
+    {% if user.is_journalist %}
+      <div class="stat-divider" aria-hidden="true"></div>
+      <div class="stat-item">
+        <span class="stat-item__value stat-item__value--success">{{ stats.my_articles }}</span>
+        <span class="stat-item__label">My Articles</span>
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Master Split Dashboard Application Grid Matrix Layout -->
+  <div class="dash-grid">
+    
+    <!-- Primary Left Content Column Feed -->
+    <main class="dash-panel" aria-labelledby="recent-articles-title">
+      <header class="dash-panel__header">
+        <h2 id="recent-articles-title" class="dash-panel__title">Recent Articles</h2>
+        <a href="{% url 'news:article_list' %}" class="dash-panel__link">View all stories →</a>
+      </header>
+      
+      {% if recent_articles %}
+        <div class="dash-article-list">
+          {% for article in recent_articles %}
+            {% if article.approved or user.is_editor or user == article.author %}
+              <article class="dash-article-item">
+                <div class="dash-article-item__main">
+                  <h3 style="font-size: 14px; font-weight: 500; margin-bottom: 2px;">
+                    <a href="{% url 'news:article_detail' article.pk %}" class="dash-article-item__title">{{ article.title }}</a>
+                  </h3>
+                  <div class="dash-article-item__meta">
+                    <span class="dash-article-item__author">{{ article.author.get_full_name|default:article.author.username }}</span>
+                    <span class="dash-meta-dot" aria-hidden="true">·</span>
+                    <time datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:"M j" }}</time>
+                    {% if article.publisher %}
+                      <span class="dash-meta-dot" aria-hidden="true">·</span>
+                      <span class="dash-article-item__publisher">{{ article.publisher.name }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <span class="badge {% if article.approved %}badge--success{% else %}badge--warning{% endif %}">
+                  {% if article.approved %}Published{% else %}Pending{% endif %}
+                </span>
+              </article>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="dash-empty">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p class="dash-empty__text">No articles found in queue data sets.</p>
+          {% if user.can_create_content %}
+            <a href="{% url 'news:article_create' %}" class="btn btn--primary btn--sm">Write First Article</a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </main>
+
+    <!-- Secondary Right Column Panel Grouping -->
+    <aside class="dash-right">
+      
+      <!-- Recent Newsletters Distribution Panel -->
+      <section class="dash-panel" aria-labelledby="recent-nl-title">
+        <header class="dash-panel__header">
+          <h2 id="recent-nl-title" class="dash-panel__title">Recent Newsletters</h2>
+          <a href="{% url 'news:newsletter_list' %}" class="dash-panel__link">View all →</a>
+        </header>
+        
+        {% if recent_newsletters %}
+          <div class="dash-article-list">
+            {% for nl in recent_newsletters %}
+            <article class="dash-nl-item">
+              <h3 style="font-size: 14px; font-weight: 500; margin-bottom: 2px;">
+                <a href="{% url 'news:newsletter_detail' nl.pk %}" class="dash-nl-item__title">{{ nl.title }}</a>
+              </h3>
+              <div class="dash-nl-item__meta">
+                <span>{{ nl.articles.count }} article{{ nl.articles.count|pluralize }}</span>
+                <span class="dash-meta-dot" aria-hidden="true">·</span>
+                <span>by {{ nl.author.get_full_name|default:nl.author.username }}</span>
+              </div>
+            </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="dash-empty">
+            <p class="dash-empty__text" style="font-size: 13px;">No active newsletters published yet.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- Quick Action Utilities Shortcut Panel Module -->
+      <section class="dash-panel" aria-labelledby="quick-actions-title">
+        <header class="dash-panel__header" style="border-bottom: none; margin-bottom: 0;">
+          <h2 id="quick-actions-title" class="dash-panel__title">Quick Actions</h2>
+        </header>
+        <div class="dash-actions">
+          {% if user.can_create_content %}
+            <a href="{% url 'news:article_create' %}" class="dash-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>New Article</span>
+            </a>
+            <a href="{% url 'news:newsletter_create' %}" class="dash-action-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span>New Newsletter</span>
+            </a>
+          {% endif %}
+          {% if user.is_editor %}
+            <a href="{% url 'news:article_approval_queue' %}" class="dash-action-btn dash-action-btn--accent">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 12-2h11"/></svg>
+              <span>Review Queue</span>
+              {% if stats.pending_articles %}
+                <span class="dash-action-badge">{{ stats.pending_articles }}</span>
+              {% endif %}
+            </a>
+          {% endif %}
+          <a href="{% url 'news:api_docs' %}" class="dash-action-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>API Reference</span>
+          </a>
+        </div>
+      </section>
+    </aside>
+
+  <!-- Reader Subscription Portal Section -->
+  {% if user.is_reader %}
+    <section class="form-section" style="margin-top: var(--sp-lg);" aria-label="Reader subscription management catalog">
+      <header class="form-section__title" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--sp-sm);">
+        <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Your Subscriptions</h2>
+        <div class="tabs" role="tablist" aria-label="Subscription categories">
+          <button class="tab-btn active" id="btn-pub" onclick="showTab('publishers')" role="tab" aria-selected="true" aria-controls="publishers-tab">Publishers</button>
+          <button class="tab-btn" id="btn-journo" onclick="showTab('journalists')" role="tab" aria-selected="false" aria-controls="journalists-tab">Journalists</button>
+        </div>
+      </header>
+
+      <!-- Publishers Index Viewport Panel Tab -->
+      <div id="publishers-tab" class="tab-content" role="tabpanel" aria-labelledby="btn-pub">
+        <div class="table-wrapper">
+          <table class="data-table" aria-label="Followed publishing agencies">
+            <thead>
+              <tr>
+                <th scope="col" class="col-title">Publisher Name</th>
+                <th scope="col" class="col-meta">Articles Status</th>
+                <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pub in user.subscribed_publishers.all %}
+                <tr>
+                  <td><strong style="color: var(--text);">{{ pub.name }}</strong></td>
+                  <td style="color: var(--text-sec);">{{ pub.articles.count }} published entry{{ pub.articles.count|pluralize:"ies" }}</td>
+                  <td class="col-actions">
+                    <form action="{% url 'accounts:toggle_subscription' 'publisher' pub.id %}" method="POST" style="display: inline-block;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn--ghost btn--sm" style="color: var(--danger); border-color: rgba(214,69,69,0.15);">Unsubscribe</button>
+                    </form>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" style="padding: 0;">
+                    <div class="empty-state">
+                      <p class="empty-state__body">You are not following any publication networks or agencies yet.</p>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Journalists Index Viewport Panel Tab -->
+      <div id="journalists-tab" class="tab-content" style="display: none;" role="tabpanel" aria-labelledby="btn-journo">
+        <div class="table-wrapper">
+          <table class="data-table" aria-label="Followed journalists staff">
+            <thead>
+              <tr>
+                <th scope="col" class="col-title">Journalist Staff Member</th>
+                <th scope="col" class="col-meta">Latest Contribution Activity</th>
+                <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for journo in user.subscribed_journalists.all %}
+                <tr>
+                  <td class="col-title">
+                    <div style="display: flex; align-items: center; gap: var(--sp-sm);">
+                      <div class="user-avatar" style="width: 28px; height: 28px; font-size: 11px;" aria-hidden="true">
+                        {{ journo.first_name|first|upper }}
+                      </div>
+                      <span style="font-weight: 500;">{{ journo.get_full_name }}</span>
+                    </div>
+                  </td>
+                  <td style="color: var(--text-sec);">{{ journo.articles.first.created_at|timesince }} ago</td>
+                  <td class="col-actions">
+                    <form action="{% url 'accounts:toggle_subscription' 'journalist' journo.id %}" method="POST" style="display: inline-block;">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn--ghost btn--sm" style="color: var(--danger); border-color: rgba(214,69,69,0.15);">Unsubscribe</button>
+                    </form>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr>
+                  <td colspan="3" style="padding: 0;">
+                    <div class="empty-state">
+                      <p class="empty-state__body">You are not following any active writers or staff reporters yet.</p>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // Clean modern navigation toggle engine for multi-panel views
+      function showTab(tabName) {
+        const pubTab = document.getElementById('publishers-tab');
+        const journoTab = document.getElementById('journalists-tab');
+        const pubBtn = document.getElementById('btn-pub');
+        const journoBtn = document.getElementById('btn-journo');
+
+        if (tabName === 'publishers') {
+          pubTab.style.display = 'block';
+          journoTab.style.display = 'none';
+          pubBtn.classList.add('active');
+          pubBtn.setAttribute('aria-selected', 'true');
+          journoBtn.classList.remove('active');
+          journoBtn.setAttribute('aria-selected', 'false');
+        } else {
+          pubTab.style.display = 'none';
+          journoTab.style.display = 'block';
+          pubBtn.classList.remove('active');
+          pubBtn.setAttribute('aria-selected', 'false');
+          journoBtn.classList.add('active');
+          journoBtn.setAttribute('aria-selected', 'true');
+        }
+      }
+    </script>
+  {% endif %}
+</div>
+{% endblock %}
+

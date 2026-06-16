@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block title %}Approval Queue — Newsroom{% endblock %}
+{% block topbar_title %}Approval Queue{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="page-header__main">
+    <h1 class="page-title">Approval Queue</h1>
+    <p class="page-subtitle">{{ total_pending }} article{{ total_pending|pluralize }} awaiting review · {{ approved_today }} approved today</p>
+  </div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar" role="search">
+  <form method="get" class="toolbar__search-form" aria-label="Search pending articles">
+    <div class="input-icon-wrap">
+      <svg class="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" name="q" class="input input--search" placeholder="Search by title, author, publisher…" value="{{ q }}" aria-label="Search pending articles">
+    </div>
+    <button type="submit" class="btn btn--ghost btn--sm">Search</button>
+    {% if q %}<a href="{% url 'news:article_approval_queue' %}" class="btn btn--ghost btn--sm">Clear</a>{% endif %}
+  </form>
+
+  <div class="toolbar__sort" role="group" aria-label="Sort order">
+    <span class="toolbar__sort-label">Sort:</span>
+    <a href="?{% if q %}q={{ q }}&{% endif %}sort=oldest" class="sort-btn {% if sort == 'oldest' %}sort-btn--active{% endif %}">Oldest first</a>
+    <a href="?{% if q %}q={{ q }}&{% endif %}sort=newest" class="sort-btn {% if sort == 'newest' %}sort-btn--active{% endif %}">Newest first</a>
+  </div>
+</div>
+
+<div class="table-wrapper" role="region" aria-label="Pending articles">
+  <table class="data-table" aria-label="Articles awaiting approval">
+    <thead>
+      <tr>
+        <th scope="col" class="col-title">Article</th>
+        <th scope="col" class="col-meta">Author</th>
+        <th scope="col" class="col-meta">Publisher</th>
+        <th scope="col" class="col-words">Words</th>
+        <th scope="col" class="col-date">Submitted</th>
+        <th scope="col" class="col-actions"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if page_obj %}
+        {% for article in page_obj %}
+        <tr>
+          <td class="col-title">
+            <a href="{% url 'news:article_approve_confirm' article.pk %}" class="queue-row__title-link">{{ article.title }}</a>
+            <div class="queue-row__snippet">{{ article.content|truncatewords:15 }}</div>
+          </td>
+          <td class="col-meta">
+            <span class="meta-name">{{ article.author.get_full_name|default:article.author.username }}</span>
+            <span class="meta-sub">{{ article.author.role|capfirst }}</span>
+          </td>
+          <td class="col-meta">
+            {% if article.publisher %}
+              <a href="{% url 'news:publisher_detail' article.publisher.pk %}" class="meta-link">{{ article.publisher.name }}</a>
+            {% else %}
+              <span class="meta-empty">Independent</span>
+            {% endif %}
+          </td>
+          <td class="col-words" style="text-align:center;color:var(--text-sec);font-size:13px">{{ article.word_count }}</td>
+          <td class="col-date">
+            <time datetime="{{ article.created_at|date:'c' }}" style="font-size:13px;color:var(--text-sec)">{{ article.created_at|date:"M j, Y" }}</time>
+          </td>
+          <td class="col-actions">
+            <div class="action-group">
+              <a href="{% url 'news:article_approve_confirm' article.pk %}" class="btn btn--ghost btn--sm">Review</a>
+              <form method="post" action="{% url 'news:article_approve' article.pk %}" style="display:inline">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="queue">
+                <button type="submit" class="btn btn--success btn--sm">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                  Approve
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="6">
+            <div class="empty-state empty-state--success">
+              <div class="empty-state__icon" aria-hidden="true">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              </div>
+              <p class="empty-state__title">Queue is clear</p>
+              <p class="empty-state__body">
+                {% if q %}No pending articles match your search.{% else %}All articles have been reviewed. Great work!{% endif %}
+              </p>
+              {% if q %}<a href="{% url 'news:article_approval_queue' %}" class="btn btn--ghost btn--sm">Clear search</a>{% endif %}
+            </div>
+          </td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
+
+  {% if page_obj.has_other_pages %}
+  <nav class="pagination" aria-label="Queue pagination">
+    {% if page_obj.has_previous %}
+      <a href="?{% if q %}q={{ q }}&{% endif %}sort={{ sort }}&page={{ page_obj.previous_page_number }}" class="pagination__btn" aria-label="Previous">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+      </a>
+    {% endif %}
+    {% for p in page_range %}
+      {% if p == page_obj.number %}
+        <span class="pagination__page pagination__page--current" aria-current="page">{{ p }}</span>
+      {% elif p == '…' %}
+        <span class="pagination__ellipsis" aria-hidden="true">…</span>
+      {% else %}
+        <a href="?{% if q %}q={{ q }}&{% endif %}sort={{ sort }}&page={{ p }}" class="pagination__page">{{ p }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <a href="?{% if q %}q={{ q }}&{% endif %}sort={{ sort }}&page={{ page_obj.next_page_number }}" class="pagination__btn" aria-label="Next">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

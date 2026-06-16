@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block title %}Edit {{ target.get_full_name|default:target.username }}{% endblock %}
+
+{% block breadcrumb %}
+  <!-- Breadcrumb Roadmap -->
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'news:dashboard' %}" class="breadcrumb__link">Dashboard</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <a href="{% url 'accounts:user_list' %}" class="breadcrumb__link">Team</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <a href="{% url 'accounts:user_detail' target.pk %}" class="breadcrumb__link">{{ target.get_full_name|default:target.username }}</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <span class="breadcrumb__current" aria-current="page">Edit</span>
+  </nav>
+{% endblock %}
+
+{% block content %}
+<div class="article-detail" style="margin: 0 auto;">
+
+  <!-- Content Header -->
+  <header class="user-profile-header" role="banner">
+    <div class="user-profile-header__info">
+      <div class="user-avatar user-avatar--profile-header" aria-hidden="true">
+        {% if target.avatar_url %}<img src="{{ target.avatar_url }}" alt="">
+        {% else %}{{ target.first_name|first|upper }}{{ target.last_name|first|upper }}{% endif %}
+      </div>
+      <div class="user-profile-header__meta">
+        <h1 class="page-title" style="margin-bottom: 0;">Edit {{ target.get_full_name|default:target.username }}</h1>
+        <p class="page-subtitle">@{{ target.username }} · {{ target.get_role_display }}</p>
+      </div>
+    </div>
+  </header>
+
+  {% if is_self %}
+  <div class="alert alert--warning" role="alert">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>You are editing your own account. Changing your role will update your permissions immediately.</span>
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate aria-label="Edit account profiles">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert--danger" role="alert">
+        {{ form.non_field_errors.0 }}
+      </div>
+    {% endif %}
+
+    <!-- Section 1: Profile Matrix -->
+    <section class="form-section">
+      <h2 class="form-section__title">Profile Information</h2>
+      
+      <div class="form-grid">
+        <div class="field">
+          <label for="{{ form.first_name.id_for_label }}">First name</label>
+          <input type="text" name="{{ form.first_name.html_name }}" id="{{ form.first_name.id_for_label }}" class="input{% if form.first_name.errors %} input--error{% endif %}" value="{{ form.first_name.value|default:'' }}">
+          {% if form.first_name.errors %}<div class="field__error" role="alert">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field">
+          <label for="{{ form.last_name.id_for_label }}">Last name</label>
+          <input type="text" name="{{ form.last_name.html_name }}" id="{{ form.last_name.id_for_label }}" class="input{% if form.last_name.errors %} input--error{% endif %}" value="{{ form.last_name.value|default:'' }}">
+          {% if form.last_name.errors %}<div class="field__error" role="alert">{{ form.last_name.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="{{ form.email.id_for_label }}">Email address</label>
+        <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}" class="input{% if form.email.errors %} input--error{% endif %}" value="{{ form.email.value|default:'' }}">
+        {% if form.email.errors %}<div class="field__error" role="alert">{{ form.email.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.bio.id_for_label }}">Biography</label>
+        <textarea name="{{ form.bio.html_name }}" id="{{ form.bio.id_for_label }}" class="input{% if form.bio.errors %} input--error{% endif %}">{{ form.bio.value|default:'' }}</textarea>
+        {% if form.bio.errors %}<div class="field__error" role="alert">{{ form.bio.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.avatar_url.id_for_label }}">Avatar URL</label>
+        <input type="url" name="{{ form.avatar_url.html_name }}" id="{{ form.avatar_url.id_for_label }}" class="input{% if form.avatar_url.errors %} input--error{% endif %}" value="{{ form.avatar_url.value|default:'' }}">
+        {% if form.avatar_url.errors %}<div class="field__error" role="alert">{{ form.avatar_url.errors.0 }}</div>{% endif %}
+      </div>
+    </section>
+
+    <!-- Section 2: Account Controls -->
+    <section class="form-section">
+      <h2 class="form-section__title">Account Settings</h2>
+      
+      <div class="field">
+        <label for="{{ form.role.id_for_label }}">Role Assignment</label>
+        <select name="{{ form.role.html_name }}" id="{{ form.role.id_for_label }}" class="input" aria-describedby="role-hint">
+          {% for value, label in form.role.field.choices %}
+            <option value="{{ value }}" {% if form.role.value == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <span class="field__help" id="role-hint">Changing roles updates group permissions and clears incompatible subscriber lists.</span>
+        {% if form.role.errors %}<div class="field__error" role="alert">{{ form.role.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <div class="checkbox-field">
+          <input type="checkbox" name="{{ form.is_active.html_name }}" id="{{ form.is_active.id_for_label }}" {% if form.is_active.value %}checked{% endif %}>
+          <label for="{{ form.is_active.id_for_label }}">Account remains active</label>
+        </div>
+        <span class="field__help">Deactivated staff members or readers cannot log in.</span>
+        {% if form.is_active.errors %}<div class="field__error" role="alert">{{ form.is_active.errors.0 }}</div>{% endif %}
+      </div>
+    </section>
+
+    <!-- Section 3: Reader Lists Panel Viewport -->
+    <section id="reader-fieldset" class="form-section" style="{% if form.role.value != 'reader' %}display:none;{% endif %}" aria-label="Reader tracking variables">
+      <h2 class="form-section__title" style="display:flex; align-items:center; gap:var(--sp-xs);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Reader Subscriptions
+        <span class="badge badge--neutral" style="font-size:11px;">Reader role only</span>
+      </h2>
+      <p style="font-size:13px; color:var(--text-sec); margin-bottom: var(--sp-md);">These options map target preferences dynamically. Selecting alternative access filters automatically detaches these metrics.</p>
+
+      <div class="field">
+        <label>Followed Publishers</label>
+        <div class="checkbox-scroll-list">
+          {% if form.subscribed_publishers %}
+            {{ form.subscribed_publishers }}
+          {% else %}
+            <p style="font-size:13px; color:var(--text-sec); font-style:italic;">No publishers provisioned inside database.</p>
+          {% endif %}
+        </div>
+        {% if form.subscribed_publishers.errors %}<div class="field__error" role="alert">{{ form.subscribed_publishers.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label>Followed Journalists</label>
+        <div class="checkbox-scroll-list">
+          {% if form.subscribed_journalists %}
+            {{ form.subscribed_journalists }}
+          {% else %}
+            <p style="font-size:13px; color:var(--text-sec); font-style:italic;">No journalists registered inside system logs.</p>
+          {% endif %}
+        </div>
+        {% if form.subscribed_journalists.errors %}<div class="field__error" role="alert">{{ form.subscribed_journalists.errors.0 }}</div>{% endif %}
+      </div>
+    </section>
+
+    <!-- Journalist content info (read-only, shown when role=journalist/editor) -->
+    <div id="journalist-fieldset" class="form-section" style="margin-bottom:16px; {% if target.role == 'reader' %}display:none{% endif %}">
+      <div class="form-section__title" style="display:flex; align-items:center; gap:var(--sp-xs);">
+        <div class="role-section-icon" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h2 class="role-section-title">Journalist Content</h2>
+        <span class="badge badge-accent" style="margin-left:auto;font-size:11px">Journalist / Editor role</span>
+      </div>
+      <p style="font-size:13px; color:var(--text-sec);">
+        Articles and newsletters are linked via reverse relations from the content models.
+        Subscription fields are set to <code style="font-size:12px;background:var(--surface);padding:1px 5px;border-radius:4px;border:1px solid var(--border)">None</code> for this role.
+        Manage content directly from the <a href="{% url 'news:article_list' %}" style="color:var(--accent)">Articles</a> and <a href="{% url 'news:newsletter_list' %}" style="color:var(--accent)">Newsletters</a> sections.
+      </p>
+    </div>
+
+    <div class="form-actions">
+      <a href="{% url 'accounts:user_detail' target.pk %}" class="btn btn--ghost">Cancel</a>
+      <button type="submit" class="btn btn--primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v14a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+  var roleSelect       = document.getElementById('id_role');
+  var readerFieldset   = document.getElementById('reader-fieldset');
+  var journalistPanel  = document.getElementById('journalist-fieldset');
+
+  if (!roleSelect) return;
+
+  function applyRole(role) {
+    var isReader     = role === 'reader';
+    var isJournalist = role === 'journalist' || role === 'editor';
+
+    // Reader fieldset
+    if (readerFieldset) {
+      readerFieldset.style.display = isReader ? '' : 'none';
+      // Remove from tab order when hidden
+      var inputs = readerFieldset.querySelectorAll('input, select, textarea');
+      inputs.forEach(function(el) {
+        el.tabIndex = isReader ? 0 : -1;
+      });
+    }
+
+    // Journalist info panel
+    if (journalistPanel) {
+      journalistPanel.style.display = isJournalist ? '' : 'none';
+    }
+  }
+
+  roleSelect.addEventListener('change', function () {
+    applyRole(this.value);
+  });
+
+  // Run on page load
+  applyRole(roleSelect.value);
+})();
+</script>
+{% endblock %}

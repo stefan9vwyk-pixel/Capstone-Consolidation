@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Delete Publisher — Newsroom{% endblock %}
+{% block topbar_title %}Delete Publisher{% endblock %}
+
+{% block content %}
+<div class="delete-card-wrap">
+  <div class="card delete-card-wrap__alert-boundary">
+    
+    <!-- Warning Header Module -->
+    <header class="delete-card-wrap__header">
+      <div class="delete-card-wrap__warning-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </div>
+      <div class="delete-card-wrap__title-block">
+        <h1 class="delete-card-wrap__heading">Delete Publisher Network</h1>
+        <p class="delete-card-wrap__subheading">Warning: This system action is permanent and cannot be reverted.</p>
+      </div>
+    </header>
+
+    <!-- Target Record Scope Metadata Card Container -->
+    <div class="info-box delete-card-wrap__meta-box">
+      <p class="delete-card-wrap__record-title">{{ publisher.name }}</p>
+      <p class="delete-card-wrap__record-stats">
+        Tracks {{ publisher.total_articles_count|default:0 }} approved story node{{ publisher.total_articles_count|pluralize }} 
+        · Staffing roster handles {{ publisher.journalists.count }} journalist{{ publisher.journalists.count|pluralize }}
+      </p>
+    </div>
+
+    <p class="delete-card-wrap__disclaimer">
+      Purging this publisher node will safely retain all mapped news report entries in the primary article catalog indexes. Associated stories will remain accessible but will lose their corporate agency network tag assignment.
+    </p>
+
+    <!-- Form Trigger Toolbar -->
+    <div class="form-actions" style="padding-top: var(--sp-xs);">
+      <form method="post" style="display: inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--danger">Confirm Delete</button>
+      </form>
+      <a href="{% url 'news:publisher_detail' publisher.pk %}" class="btn btn--ghost">Cancel Action</a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}{{ journalist.get_full_name }}{% endblock %}
+
+{% block content %}
+  <nav class="breadcrumb" aria-label="Breadcrumb navigation">
+    <a href="{% url 'accounts:journalist_list' %}" class="breadcrumb__link">Journalists</a>
+    <span class="breadcrumb__sep" aria-hidden="true">/</span>
+    <span class="breadcrumb__current" aria-current="page">{{ journalist.username }}</span>
+  </nav>
+
+<!-- Profile Header Hero Banner -->
+<section class="profile-hero" aria-label="Journalist Profile Summary">
+    <div class="profile-hero__avatar-wrap">
+        <div class="user-avatar user-avatar--profile">
+            {% if journalist.avatar_url %}
+                <img src="{{ journalist.avatar_url }}" alt="{{ journalist.get_full_name|default:journalist.username }}">
+            {% else %}
+                {{ journalist.first_name|first|upper }}{{ journalist.last_name|first|upper }}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="profile-hero__identity">
+        <h1 class="page-title">{{ journalist.get_full_name }}</h1>
+        <span class="badge badge--accent profile-hero__badge">Staff Journalist</span>
+        <p class="profile-hero__bio">{{ journalist.bio|default:"This journalist hasn't added a bio yet." }}</p>
+    </div>
+
+    <div class="profile-hero__actions">
+        {% if user.is_authenticated and user.is_reader %}
+        <form action="{% url 'accounts:toggle_subscription' 'journalist' journalist.id %}" method="POST" class="profile-hero__form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn--lg {% if journalist in user.subscribed_journalists.all %}btn--secondary{% else %}btn--primary{% endif %}">
+                {% if journalist in user.subscribed_journalists.all %}Unfollow{% else %}Follow Journalist{% endif %}
+            </button>
+        </form>
+        {% endif %}
+        <p class="profile-hero__subscribers">{{ journalist.journalist_subscribers.count }} Followers</p>
+    </div>
+</section>
+
+<!-- Content Feed & Analytics Sidebar Split Grid -->
+<div class="profile-feed-layout">
+    <main class="profile-feed-layout__stories">
+        <h2 class="profile-feed-layout__heading">Latest Stories</h2>
+        {% for article in articles %}
+            <article class="story-card">
+                <header class="story-card__header">
+                    <time class="story-card__date" datetime="{{ article.created_at|date:'Y-m-d' }}">{{ article.created_at|date:"M d, Y" }}</time>
+                    <h3 class="story-card__title">
+                        <a href="{% url 'news:article_detail' article.pk %}">{{ article.title }}</a>
+                    </h3>
+                </header>
+                <p class="story-card__excerpt">{{ article.content|truncatewords:30 }}</p>
+                <footer class="story-card__footer">
+                    <span class="badge badge--neutral">{{ article.publisher.name|default:"Independent" }}</span>
+                    <span class="story-card__meta">{{ article.word_count }} words</span>
+                </footer>
+            </article>
+        {% empty %}
+            <div class="empty-state">
+                <div class="empty-state__icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <h3 class="empty-state__title">No published articles yet</h3>
+                <p class="empty-state__body">This writer has not published any entries into the active newsroom queue yet.</p>
+            </div>
+        {% endfor %}
+    </main>
+
+    <!-- Sidebar Metrics Info-box Panel -->
+    <aside class="profile-feed-layout__sidebar">
+        <div class="info-box">
+            <h3 class="info-box__header" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; font-size: 12px; color: var(--text-sec);">
+                Writing Statistics
+            </h3>
+            <ul class="info-box__list">
+                <li style="justify-content: space-between; width: 100%; border-bottom: 1px solid var(--border); padding-bottom: var(--sp-sm);">
+                    <span>Total Articles</span>
+                    <strong>{{ journalist.articles.count }}</strong>
+                </li>
+                <li style="justify-content: space-between; width: 100%; padding-top: var(--sp-xs);">
+                    <span>Newsletters Issued</span>
+                    <strong>{{ journalist.newsletters.count }}</strong>
+                </li>
+            </ul>
+        </div>
+    </aside>
+</div>
+{% endblock %}

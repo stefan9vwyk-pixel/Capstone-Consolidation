@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users{% endblock %}
+{% block breadcrumb %}
+  <a href="{% url 'news:dashboard' %}">Dashboard</a>
+  <span class="bc-sep" aria-hidden="true">/</span>
+  <span class="current" aria-current="page">Team Members</span>
+{% endblock %}
+{% block content %}
+<div class="page-content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Team Members</h1>
+      <p class="page-desc">Manage journalist and reader accounts across the newsroom.</p>
+    </div>
+    <a href="{% url 'accounts:user_create' %}" class="btn btn--primary">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Add User
+    </a>
+  </div>
+
+  <!-- Stats row -->
+  <div class="stats-grid" role="region" aria-label="User statistics">
+    <div class="stat-card stat-accent">
+      <div class="stat-label">Total Users</div>
+      <div class="stat-value">{{ stats.total }}</div>
+      <div class="stat-sub">All roles</div>
+    </div>
+    <div class="stat-card stat-success">
+      <div class="stat-label">Editors</div>
+      <div class="stat-value">{{ stats.editors }}</div>
+      <div class="stat-sub">Full access</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Journalists</div>
+      <div class="stat-value">{{ stats.journalists }}</div>
+      <div class="stat-sub">Content creators</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Readers</div>
+      <div class="stat-value">{{ stats.readers }}</div>
+      <div class="stat-sub">View only</div>
+    </div>
+    {% if stats.inactive %}
+    <div class="stat-card stat-danger">
+      <div class="stat-label">Inactive</div>
+      <div class="stat-value">{{ stats.inactive }}</div>
+      <div class="stat-sub">Deactivated</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Table card -->
+  <div class="table-wrapper">
+    <form method="get" action="{% url 'accounts:user_list' %}" id="userFilterForm" role="search" aria-label="Filter users">
+      <div class="table-toolbar">
+        <div class="toolbar-row">
+          <div class="toolbar-row-left">
+            <div class="search-wrapper">
+              <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="search" name="q" value="{{ query }}"
+                     placeholder="Search name, username, email…"
+                     class="form-control search-input"
+                     aria-label="Search users">
+            </div>
+            <label for="id_role_filter" class="visually-hidden">Filter by role</label>
+            <select id="id_role_filter" name="role" class="form-select" style="width:auto"
+                    onchange="document.getElementById('userFilterForm').submit()">
+              <option value="">All roles</option>
+              <option value="editor"     {% if role_filter == 'editor'     %}selected{% endif %}>Editors</option>
+              <option value="journalist" {% if role_filter == 'journalist' %}selected{% endif %}>Journalists</option>
+              <option value="reader"     {% if role_filter == 'reader'     %}selected{% endif %}>Readers</option>
+            </select>
+            <label for="id_active_filter" class="visually-hidden">Filter by status</label>
+            <select id="id_active_filter" name="active" class="form-select" style="width:auto"
+                    onchange="document.getElementById('userFilterForm').submit()">
+              <option value="">All statuses</option>
+              <option value="active"   {% if active_filter == 'active'   %}selected{% endif %}>Active</option>
+              <option value="inactive" {% if active_filter == 'inactive' %}selected{% endif %}>Inactive</option>
+            </select>
+          </div>
+          <div class="toolbar-row-right">
+            <button type="submit" class="btn btn-secondary btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+            </button>
+            {% if query or role_filter or active_filter %}
+            <a href="{% url 'accounts:user_list' %}" class="btn btn-ghost btn-sm">× Clear</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="results-summary" role="status" aria-live="polite">
+      {% if total_count == 0 %}
+        No users found{% if query or role_filter or active_filter %} matching your filters{% endif %}.
+      {% else %}
+        <strong>{{ total_count }}</strong> user{{ total_count|pluralize }} found{% if query %} for <strong>"{{ query }}"</strong>{% endif %}
+      {% endif %}
+    </div>
+
+    <div class="table-scroll" role="region" aria-label="Users table">
+      <table aria-label="Team members">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col">Role</th>
+            <th scope="col">Articles</th>
+            <th scope="col">Newsletters</th>
+            <th scope="col">Subscriptions</th>
+            <th scope="col">Status</th>
+            <th scope="col">Joined</th>
+            <th scope="col"><span class="visually-hidden">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if not users %}
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-icon" aria-hidden="true">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <p class="empty-title">No users found</p>
+                <p class="empty-desc">
+                  {% if query or role_filter or active_filter %}
+                    Try adjusting your search or filters.
+                  {% else %}
+                    No users have been created yet.
+                  {% endif %}
+                </p>
+                <a href="{% url 'accounts:user_create' %}" class="btn btn-primary btn-sm">Add first user</a>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          {% for u in users %}
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <div class="user-avatar" style="width:32px;height:32px;font-size:11px;flex-shrink:0" aria-hidden="true">
+                  {% if u.avatar_url %}
+                    <img src="{{ u.avatar_url }}" alt="">
+                  {% else %}
+                    {{ u.first_name|first|upper }}{{ u.last_name|first|upper }}
+                  {% endif %}
+                </div>
+                <div>
+                  <a href="{% url 'accounts:user_detail' u.pk %}" style="font-weight:600;font-size:14px;color:var(--text);text-decoration:none">
+                    {{ u.get_full_name|default:u.username }}
+                  </a>
+                  <div style="font-size:12px;color:var(--text-sec)">@{{ u.username }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge {% if u.role == 'editor' %}badge-success{% elif u.role == 'journalist' %}badge-accent{% else %}badge-neutral{% endif %}">
+                {{ u.get_role_display }}
+              </span>
+            </td>
+            <td>
+              <span style="font-size:14px;color:var(--text)">{{ u.article_count }}</span>
+            </td>
+            <td>
+              <span style="font-size:14px;color:var(--text)">{{ u.newsletter_count }}</span>
+            </td>
+            <td>
+              {% if u.role == 'reader' %}
+                <span style="font-size:12px;color:var(--text-sec)">
+                  {{ u.subscribed_publishers.count }}P / {{ u.subscribed_journalists.count }}J
+                </span>
+              {% else %}
+                <span style="font-size:12px;color:var(--text-sec)">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if u.is_active %}
+                <span class="badge badge--success">Active</span>
+              {% else %}
+                <span class="badge badge--danger">Inactive</span>
+              {% endif %}
+            </td>
+            <td style="font-size:12px;color:var(--text-sec)">{{ u.date_joined|date:"M j, Y" }}</td>
+            <td>
+              <div class="row-actions">
+                <a href="{% url 'accounts:user_detail' u.pk %}" class="btn btn-ghost btn-sm" aria-label="View {{ u.get_full_name|default:u.username }}">View</a>
+                <a href="{% url 'accounts:user_edit' u.pk %}" class="btn btn-secondary btn-sm" aria-label="Edit {{ u.get_full_name|default:u.username }}">Edit</a>
+                {% if u != request.user %}
+                <form method="post" action="{% url 'accounts:user_deactivate' u.pk %}" style="display:inline" aria-label="Toggle account status">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn--sm {% if u.is_active %}btn--danger{% else %}btn--ghost{% endif %}"
+                          onclick="return confirm('{% if u.is_active %}Deactivate{% else %}Activate{% endif %} {{ u.get_full_name|default:u.username }}?')">
+                    {% if u.is_active %}Deactivate{% else %}Activate{% endif %}
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
