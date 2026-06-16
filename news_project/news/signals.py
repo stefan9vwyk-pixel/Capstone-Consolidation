@@ -74,8 +74,8 @@ def _collect_subscriber_emails(article):
 def _send_approval_emails(article, subscriber_emails):
     """Send notification emails to all subscribers.
 
-    This uses Django's `send_mail` which will obey the configured email
-    backend; in development this may be the console backend.
+       This uses Django's `send_mail` which will obey the configured email
+       backend; in development this may be the console backend.
     """
     if not subscriber_emails:
         logger.info(
@@ -130,9 +130,9 @@ def _send_approval_emails(article, subscriber_emails):
 def _post_to_approved_endpoint(article):
     """POST article data to the internal /api/approved/ endpoint.
 
-    Runs in a background thread so it doesn't block the request cycle. This
-    function is tolerant of missing `requests` library or network failures
-    — it will log warnings but not raise errors.
+       Runs in a background thread so it doesn't block the request cycle. This
+       function is tolerant of missing `requests` library or network failures
+       — it will log warnings but not raise errors.
     """
     try:
         import requests as req_lib
@@ -182,10 +182,10 @@ def _post_to_approved_endpoint(article):
 def on_article_save(sender, instance, created, **kwargs):
     """Signal handler triggered after an Article is saved.
 
-    The handler performs post-approval actions only when the article has
-    just been approved. To avoid triggering on unrelated saves, the view
-    or model code sets a `_approval_just_toggled` sentinel on the instance
-    around the save() call; this handler checks that flag to decide.
+       The handler performs post-approval actions only when the article has
+       just been approved. To avoid triggering on unrelated saves, the view
+       or model code sets a `_approval_just_toggled` sentinel on the instance
+       around the save() call; this handler checks that flag to decide.
     """
     # Ignore if the article is not approved after save.
     if not instance.approved:
