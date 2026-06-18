@@ -2,6 +2,10 @@ from django.db import models
 
 
 class Publisher(models.Model):
+    """
+    A publishing organization that can own articles and
+     assign journalists/editors.
+    """
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     website = models.URLField(blank=True)
@@ -25,11 +29,17 @@ class Publisher(models.Model):
 
     @property
     def approved_articles_count(self):
-        '''Returns the total number of approved articles for this Publisher.'''
+        """
+        Return the number of approved articles associated with this publisher.
+        """
         return self.articles.filter(approved=True).count()
 
 
 class Article(models.Model):
+    """
+    A single journalistic article authored by a
+    journalist and optionally published.
+    """
     title = models.CharField(max_length=300)
     content = models.TextField()
     author = models.ForeignKey(
@@ -62,13 +72,18 @@ class Article(models.Model):
         return self.title
 
     def get_status_label(self):
+        """
+        Return a human-readable status label for the article approval state.
+        """
         return 'Approved' if self.approved else 'Pending'
 
     def get_status_class(self):
+        """Return a CSS class name for the article approval status badge."""
         return 'badge--success' if self.approved else 'badge--warning'
 
     @property
     def word_count(self):
+        """Return the total number of words in the article content."""
         return len(self.content.split())
 
     @property
@@ -80,6 +95,9 @@ class Article(models.Model):
 
 
 class Newsletter(models.Model):
+    """
+    A curated newsletter containing selected articles and authored by a user.
+    """
     title = models.CharField(max_length=300)
     description = models.TextField(blank=True)
     author = models.ForeignKey(

@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>accounts.management.commands.seed_demo &mdash; Newsroom 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            Newsroom
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">news_project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">Newsroom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">accounts.management.commands.seed_demo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for accounts.management.commands.seed_demo</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span>
+
+
+<div class="viewcode-block" id="Command">
+<a class="viewcode-back" href="../../../../accounts.management.commands.html#accounts.management.commands.seed_demo.Command">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s1">&#39;Seed demo users, publishers, articles, and newsletters&#39;</span>
+
+<div class="viewcode-block" id="Command.handle">
+<a class="viewcode-back" href="../../../../accounts.management.commands.html#accounts.management.commands.seed_demo.Command.handle">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">accounts.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomUser</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">news.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">Newsletter</span>
+
+        <span class="c1"># Create demo users</span>
+        <span class="n">users_data</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> 
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;admin@newsroom.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Admin&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;User&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;editor&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;admin123&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;is_staff&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s1">&#39;is_superuser&#39;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;editor1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;editor@newsroom.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Sarah&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Mitchell&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;editor&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;editor123&#39;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist@newsroom.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;James&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Carter&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist123&#39;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist2@newsroom.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Priya&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Sharma&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;journalist123&#39;</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;reader1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s1">&#39;reader@newsroom.com&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;first_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Alex&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;last_name&#39;</span><span class="p">:</span> <span class="s1">&#39;Turner&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;role&#39;</span><span class="p">:</span> <span class="s1">&#39;reader&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s1">&#39;reader123&#39;</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+
+        <span class="n">created_users</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">users_data</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+                    <span class="n">username</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                    <span class="n">email</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;email&#39;</span><span class="p">],</span>
+                    <span class="n">first_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;first_name&#39;</span><span class="p">],</span>
+                    <span class="n">last_name</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;last_name&#39;</span><span class="p">],</span>
+                    <span class="n">role</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;role&#39;</span><span class="p">],</span>
+                    <span class="n">password</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">],</span>
+                    <span class="n">is_staff</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_staff&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="n">is_superuser</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;is_superuser&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="n">created_users</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">user</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;  Created user: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="si">}</span><span class="s1">)&#39;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">created_users</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">username</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="n">journalist1</span> <span class="o">=</span> <span class="n">created_users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;journalist1&#39;</span><span class="p">)</span>
+        <span class="n">journalist2</span> <span class="o">=</span> <span class="n">created_users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;journalist2&#39;</span><span class="p">)</span>
+        <span class="n">editor1</span> <span class="o">=</span> <span class="n">created_users</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;editor1&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create publishers</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">pub1</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;The Daily Chronicle&#39;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s1">&#39;A leading national newspaper covering politics, &#39;</span>
+                    <span class="s1">&#39;business, and culture.&#39;</span>
+                <span class="p">),</span>
+                <span class="n">website</span><span class="o">=</span><span class="s1">&#39;https://dailychronicle.example.com&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">pub1</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">editor1</span><span class="p">)</span>
+            <span class="n">pub1</span><span class="o">.</span><span class="n">journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span><span class="p">)</span>
+
+            <span class="n">pub2</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Tech Insider Weekly&#39;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                    <span class="s1">&#39;Your source for the latest in technology, &#39;</span>
+                    <span class="s1">&#39;startups, and innovation.&#39;</span>
+                <span class="p">),</span>
+                <span class="n">website</span><span class="o">=</span><span class="s1">&#39;https://techinsider.example.com&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">pub2</span><span class="o">.</span><span class="n">editors</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">editor1</span><span class="p">)</span>
+            <span class="n">pub2</span><span class="o">.</span><span class="n">journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">journalist2</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Created publishers.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create articles</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">articles_data</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;Global Climate Summit Reaches Historic Agreement&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;World leaders gathered in Geneva this week to sign &#39;</span>
+                        <span class="s1">&#39;what many are calling the most significant climate &#39;</span>
+                        <span class="s1">&#39;agreement in decades. The accord commits 195 &#39;</span>
+                        <span class="s1">&#39;nations to reducing carbon emissions by 45% before &#39;</span>
+                        <span class="s1">&#39;2035, with binding enforcement mechanisms that &#39;</span>
+                        <span class="s1">&#39;previous agreements lacked.</span><span class="se">\n\n</span><span class="s1">The deal, brokered &#39;</span>
+                        <span class="s1">&#39;after 72 hours of continuous negotiations, &#39;</span>
+                        <span class="s1">&#39;includes a $500 billion green transition fund for &#39;</span>
+                        <span class="s1">&#39;developing nations. Environmental groups have &#39;</span>
+                        <span class="s1">&#39;cautiously welcomed the agreement while noting that &#39;</span>
+                        <span class="s1">&#39;implementation details remain vague.</span><span class="se">\n\n</span><span class="s1">&quot;This is a &#39;</span>
+                        <span class="s1">&#39;turning point,&quot; said UN Secretary-General Maria &#39;</span>
+                        <span class="s1">&#39;Santos. &quot;For the first time, we have teeth in our &#39;</span>
+                        <span class="s1">&#39;commitments.&quot; Critics, however, point out that &#39;</span>
+                        <span class="s1">&#39;several major industrial nations negotiated &#39;</span>
+                        <span class="s1">&#39;exemptions for key sectors.</span><span class="se">\n\n</span><span class="s1">Markets reacted &#39;</span>
+                        <span class="s1">&#39;positively to the news, with renewable energy stocks &#39;</span>
+                        <span class="s1">&#39;surging across global exchanges. The agreement is &#39;</span>
+                        <span class="s1">&#39;set to take effect in January 2026, pending &#39;</span>
+                        <span class="s1">&#39;ratification by member states.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">journalist1</span><span class="p">,</span>
+                    <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">(),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;AI Startup Raises $2B in Record Funding Round&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;San Francisco-based artificial intelligence &#39;</span>
+                        <span class="s1">&#39;company NeuralPath has closed a $2 billion Series C &#39;</span>
+                        <span class="s1">&#39;funding round, setting a new record for early-stage &#39;</span>
+                        <span class="s1">&#39;AI investment. The round was led by Sequoia Capital &#39;</span>
+                        <span class="s1">&#39;with participation from SoftBank, Google Ventures, &#39;</span>
+                        <span class="s1">&#39;and several sovereign wealth funds.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;NeuralPath, founded in 2023, develops large language &#39;</span>
+                        <span class="s1">&#39;models specialized for enterprise use cases &#39;</span>
+                        <span class="s1">&#39;including legal document analysis, medical diagnosis &#39;</span>
+                        <span class="s1">&#39;support, and financial modeling. The company claims &#39;</span>
+                        <span class="s1">&#39;its models achieve 40% better accuracy than &#39;</span>
+                        <span class="s1">&#39;general-purpose alternatives on domain-specific &#39;</span>
+                        <span class="s1">&#39;tasks.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;CEO Dr. Aisha Patel said the funding will be used to &#39;</span>
+                        <span class="s1">&#39;expand their research team from 200 to 800 employees &#39;</span>
+                        <span class="s1">&#39;and establish data centers in Europe and Asia. The &#39;</span>
+                        <span class="s1">&#39;company is reportedly valued at $18 billion &#39;</span>
+                        <span class="s1">&#39;post-money.</span><span class="se">\n\n</span><span class="s1">The raise comes amid intense &#39;</span>
+                        <span class="s1">&#39;competition in the enterprise AI space, with &#39;</span>
+                        <span class="s1">&#39;Microsoft, Google, and Amazon all aggressively &#39;</span>
+                        <span class="s1">&#39;expanding their own offerings.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">journalist2</span><span class="p">,</span>
+                    <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Central Banks Signal Coordinated Rate Cuts&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;The Federal Reserve, European Central Bank, and &#39;</span>
+                        <span class="s1">&#39;Bank of England issued a rare joint statement &#39;</span>
+                        <span class="s1">&#39;Tuesday signaling coordinated interest rate &#39;</span>
+                        <span class="s1">&#39;reductions beginning next quarter. The &#39;</span>
+                        <span class="s1">&#39;announcement sent bond yields tumbling and equity &#39;</span>
+                        <span class="s1">&#39;markets to multi-month highs.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;The three institutions cited easing inflation &#39;</span>
+                        <span class="s1">&#39;pressures and growing concerns about economic &#39;</span>
+                        <span class="s1">&#39;slowdown as the primary drivers. The Fed is &#39;</span>
+                        <span class="s1">&#39;expected to cut rates by 50 basis points, while &#39;</span>
+                        <span class="s1">&#39;the ECB and BoE are forecasting 25 basis point &#39;</span>
+                        <span class="s1">&#39;reductions.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;Economists were split on the wisdom of coordination. &#39;</span>
+                        <span class="s1">&#39;&quot;Synchronized easing amplifies the stimulus effect,&quot; &#39;</span>
+                        <span class="s1">&#39;said Dr. Robert Chen of the Peterson Institute. &#39;</span>
+                        <span class="s1">&#39;&quot;But it also reduces the ability of individual &#39;</span>
+                        <span class="s1">&#39;central banks to respond to country-specific &#39;</span>
+                        <span class="s1">&#39;conditions.&quot;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;Mortgage rates are expected to begin declining &#39;</span>
+                        <span class="s1">&#39;within weeks of the announcement, providing relief &#39;</span>
+                        <span class="s1">&#39;to housing markets that have been frozen by high &#39;</span>
+                        <span class="s1">&#39;borrowing costs.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">journalist1</span><span class="p">,</span>
+                    <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">first</span><span class="p">(),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;New Study Links Urban Green Spaces to Mental Health&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;A comprehensive 10-year study involving 50,000 &#39;</span>
+                        <span class="s1">&#39;participants across 12 cities has found that access &#39;</span>
+                        <span class="s1">&#39;to urban parks and green spaces reduces rates of &#39;</span>
+                        <span class="s1">&#39;anxiety and depression by up to 30%. The research, &#39;</span>
+                        <span class="s1">&#39;published in The Lancet, is the largest &#39;</span>
+                        <span class="s1">&#39;longitudinal study of its kind.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;Researchers at Oxford University tracked &#39;</span>
+                        <span class="s1">&#39;participants` mental health outcomes alongside &#39;</span>
+                        <span class="s1">&#39;detailed geospatial data on their proximity to &#39;</span>
+                        <span class="s1">&#39;parks, street trees, and community gardens. &#39;</span>
+                        <span class="s1">&#39;The effect was found to be independent of income, &#39;</span>
+                        <span class="s1">&#39;age, and pre-existing conditions.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;&quot;The evidence is now unambiguous,&quot; said lead &#39;</span>
+                        <span class="s1">&#39;researcher Dr. Emma Blackwood. &quot;Green space is &#39;</span>
+                        <span class="s1">&#39;not a luxury amenity — it is a public health &#39;</span>
+                        <span class="s1">&#39;necessity.&quot; The study recommends that city &#39;</span>
+                        <span class="s1">&#39;planners allocate at least 15</span><span class="si">% o</span><span class="s1">f urban land &#39;</span>
+                        <span class="s1">&#39;to accessible green space.</span><span class="se">\n\n</span><span class="s1">Several major &#39;</span>
+                        <span class="s1">&#39;cities have already cited the research in updated &#39;</span>
+                        <span class="s1">&#39;zoning policies, with London, Paris, and Singapore &#39;</span>
+                        <span class="s1">&#39;announcing expanded urban greening programs.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">journalist2</span><span class="p">,</span>
+                    <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;Breakthrough in Quantum Computing Achieves &#39;</span>
+                        <span class="s1">&#39;1000-Qubit Milestone&#39;</span>
+                        <span class="p">),</span>
+                    <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="s1">&#39;IBM Research has announced a quantum processor &#39;</span>
+                        <span class="s1">&#39;capable of sustaining 1,000 stable qubits, a &#39;</span>
+                        <span class="s1">&#39;milestone that researchers say brings practical &#39;</span>
+                        <span class="s1">&#39;quantum computing significantly closer. &#39;</span>
+                        <span class="s1">&#39;Previous systems struggled to maintain coherence &#39;</span>
+                        <span class="s1">&#39;beyond 400 qubits under real-world conditions.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;The achievement relies on a novel error-correction &#39;</span>
+                        <span class="s1">&#39;architecture that reduces decoherence — the primary &#39;</span>
+                        <span class="s1">&#39;obstacle to scaling quantum systems. IBM</span><span class="se">\&#39;</span><span class="s1">s team &#39;</span>
+                        <span class="s1">&#39;demonstrated the processor solving an optimization &#39;</span>
+                        <span class="s1">&#39;problem in 3 minutes that would take classical &#39;</span>
+                        <span class="s1">&#39;supercomputers an estimated 10,000 years.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;The announcement has major implications for &#39;</span>
+                        <span class="s1">&#39;cryptography, drug discovery, and logistics. &#39;</span>
+                        <span class="s1">&#39;Current encryption standards, including &#39;</span>
+                        <span class="s1">&#39;RSA-2048, could be vulnerable to quantum &#39;</span>
+                        <span class="s1">&#39;attacks within the decade, prompting renewed &#39;</span>
+                        <span class="s1">&#39;urgency around post-quantum cryptography &#39;</span>
+                        <span class="s1">&#39;standards.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;IBM plans to make the system available through &#39;</span>
+                        <span class="s1">&#39;its cloud platform by mid-2026, with pricing &#39;</span>
+                        <span class="s1">&#39;aimed at enterprise customers.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">journalist2</span><span class="p">,</span>
+                    <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">last</span><span class="p">(),</span>
+                <span class="p">},</span>
+            <span class="p">]</span>
+
+            <span class="n">created_articles</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">articles_data</span><span class="p">:</span>
+                <span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">created_articles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;  Created article: </span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="p">[:</span><span class="mi">50</span><span class="p">]</span><span class="si">}</span><span class="s1">...&#39;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Create newsletters</span>
+            <span class="k">if</span> <span class="n">created_articles</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">nl1</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Weekly World Digest&#39;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                        <span class="s1">&#39;A curated roundup of the most important global &#39;</span>
+                        <span class="s1">&#39;stories from the past week, covering politics, &#39;</span>
+                        <span class="s1">&#39;economics, and society.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="n">author</span><span class="o">=</span><span class="n">journalist1</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">nl1</span><span class="o">.</span><span class="n">articles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">created_articles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">created_articles</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+                <span class="n">nl2</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Tech &amp; Innovation Briefing&#39;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+                        <span class="s1">&#39;Stay ahead of the curve with our weekly &#39;</span>
+                        <span class="s1">&#39;technology newsletter covering AI, startups, &#39;</span>
+                        <span class="s1">&#39;and digital transformation.&#39;</span>
+                    <span class="p">),</span>
+                    <span class="n">author</span><span class="o">=</span><span class="n">journalist2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">nl2</span><span class="o">.</span><span class="n">articles</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">created_articles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">created_articles</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Created newsletters.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span><span class="s1">&#39;Demo data seeded successfully.&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span><span class="s1">&#39;=== Demo Login Credentials ===&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Editor:     editor1 / editor123&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Journalist: journalist1 / journalist123&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Journalist: journalist2 / journalist123&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Reader:     reader1 / reader123&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;  Admin:      admin / admin123&#39;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Stefan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -15,6 +15,9 @@ from accounts.decorators import editor_required
 # ── Dashboard ───────────────────────────────────────────────────────────────
 
 def dashboard_view(request):
+    """
+    Render the news dashboard with recent content and user-specific metrics.
+    """
     if not request.user.is_authenticated:
         return redirect('accounts:login')
 
@@ -54,6 +57,9 @@ def dashboard_view(request):
 
 @login_required
 def article_list_view(request):
+    """
+    Display a paginated, filterable list of articles for authorized users.
+    """
     base_qs = Article.objects.select_related(
         'author',
         'publisher'
@@ -122,6 +128,7 @@ def article_list_view(request):
 
 @login_required
 def article_detail_view(request, pk):
+    """Render a single article detail page, enforcing reader access rules."""
     article = get_object_or_404(Article, pk=pk)
     if request.user.is_reader and not article.approved:
         messages.error(request, 'This article is not yet available.')
@@ -137,6 +144,7 @@ def article_detail_view(request, pk):
 
 @login_required
 def article_create_view(request):
+    """Handle article creation and redirect to the new article detail view."""
     if not request.user.can_create_content:
         messages.error(
             request,
@@ -163,6 +171,7 @@ def article_create_view(request):
 
 @login_required
 def article_edit_view(request, pk):
+    """Handle editing an existing article when the user has permission."""
     article = get_object_or_404(Article, pk=pk)
     if not (request.user.can_create_content and (
             request.user == article.author or request.user.is_editor)):
@@ -188,6 +197,7 @@ def article_edit_view(request, pk):
 
 @login_required
 def article_delete_view(request, pk):
+    """Confirm and delete an article if the current user is authorized."""
     article = get_object_or_404(Article, pk=pk)
     if not (request.user == article.author or request.user.is_editor):
         messages.error(
@@ -317,6 +327,7 @@ def article_approve_confirm_view(request, pk):
 
 @login_required
 def newsletter_list_view(request):
+    """Render a searchable, paginated list of newsletters."""
     from django.db.models import Q
     newsletters = Newsletter.objects.select_related(
         'author'
@@ -349,6 +360,7 @@ def newsletter_list_view(request):
 
 @login_required
 def newsletter_detail_view(request, pk):
+    """Show details for a newsletter and whether the user may edit it."""
     newsletter = get_object_or_404(Newsletter, pk=pk)
     return render(request, 'news/newsletter_detail.html', {
         'newsletter': newsletter,
@@ -363,6 +375,9 @@ def newsletter_detail_view(request, pk):
 
 @login_required
 def newsletter_create_view(request):
+    """
+    Handle newsletter creation and redirect to the new newsletter detail view.
+    """
     if not request.user.can_create_content:
         messages.error(
             request,
@@ -389,6 +404,7 @@ def newsletter_create_view(request):
 
 @login_required
 def newsletter_edit_view(request, pk):
+    """Handle editing an existing newsletter when the user is authorized."""
     newsletter = get_object_or_404(Newsletter, pk=pk)
     if not (request.user.can_create_content and (
             request.user == newsletter.author or request.user.is_editor)):
@@ -417,6 +433,7 @@ def newsletter_edit_view(request, pk):
 
 @login_required
 def newsletter_delete_view(request, pk):
+    """Confirm and delete a newsletter when the current user may do so."""
     newsletter = get_object_or_404(Newsletter, pk=pk)
     if not (request.user == newsletter.author or request.user.is_editor):
         messages.error(
@@ -505,6 +522,7 @@ def publisher_delete_view(request, pk):
 
 @login_required
 def publisher_list_view(request):
+    """Render a list of publishers including approved article counts."""
     publishers = Publisher.objects.prefetch_related(
         'editors',
         'journalists',
@@ -525,6 +543,7 @@ def publisher_list_view(request):
 
 @login_required
 def publisher_detail_view(request, pk):
+    """Show a publisher with its articles, hiding drafts from readers."""
     publisher = get_object_or_404(Publisher, pk=pk)
     articles = publisher.articles.select_related(
         'author'
@@ -541,4 +560,5 @@ def publisher_detail_view(request, pk):
 
 @login_required
 def api_docs_view(request):
+    """Render the API documentation page for authenticated users."""
     return render(request, 'news/api_docs.html')

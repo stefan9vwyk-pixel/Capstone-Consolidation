@@ -1,0 +1,1191 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>accounts package &mdash; Newsroom 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="accounts.management package" href="accounts.management.html" />
+    <link rel="prev" title="news_project" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Newsroom
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">news_project</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">accounts package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.html">accounts.management package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html">accounts.migrations package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.admin">accounts.admin module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.admin.CustomUserAdmin"><code class="docutils literal notranslate"><span class="pre">CustomUserAdmin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.apps">accounts.apps module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.apps.AccountsConfig"><code class="docutils literal notranslate"><span class="pre">AccountsConfig</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.decorators">accounts.decorators module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.forms">accounts.forms module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.forms.LoginForm"><code class="docutils literal notranslate"><span class="pre">LoginForm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.forms.ProfileForm"><code class="docutils literal notranslate"><span class="pre">ProfileForm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.forms.RegisterForm"><code class="docutils literal notranslate"><span class="pre">RegisterForm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.management_forms">accounts.management_forms module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_forms.UserCreateForm"><code class="docutils literal notranslate"><span class="pre">UserCreateForm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_forms.UserEditForm"><code class="docutils literal notranslate"><span class="pre">UserEditForm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.management_views">accounts.management_views module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_views.user_create_view"><code class="docutils literal notranslate"><span class="pre">user_create_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_views.user_deactivate_view"><code class="docutils literal notranslate"><span class="pre">user_deactivate_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_views.user_detail_view"><code class="docutils literal notranslate"><span class="pre">user_detail_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_views.user_edit_view"><code class="docutils literal notranslate"><span class="pre">user_edit_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.management_views.user_list_view"><code class="docutils literal notranslate"><span class="pre">user_list_view()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.models">accounts.models module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.models.CustomUser"><code class="docutils literal notranslate"><span class="pre">CustomUser</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.signals">accounts.signals module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.signals.create_auth_token"><code class="docutils literal notranslate"><span class="pre">create_auth_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.signals.create_groups"><code class="docutils literal notranslate"><span class="pre">create_groups()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.urls">accounts.urls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts.views">accounts.views module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.journalist_list_view"><code class="docutils literal notranslate"><span class="pre">journalist_list_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.journalist_public_profile"><code class="docutils literal notranslate"><span class="pre">journalist_public_profile()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.login_view"><code class="docutils literal notranslate"><span class="pre">login_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.logout_view"><code class="docutils literal notranslate"><span class="pre">logout_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.profile_view"><code class="docutils literal notranslate"><span class="pre">profile_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.register_view"><code class="docutils literal notranslate"><span class="pre">register_view()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accounts.views.toggle_subscription"><code class="docutils literal notranslate"><span class="pre">toggle_subscription()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-accounts">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="manage.html">manage module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="news.html">news package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="news_project.html">news_project package</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Newsroom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">news_project</a></li>
+      <li class="breadcrumb-item active">accounts package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/accounts.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="accounts-package">
+<h1>accounts package<a class="headerlink" href="#accounts-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="accounts.management.html">accounts.management package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="accounts.management.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.management.commands.html">accounts.management.commands package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.commands.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.commands.html#module-accounts.management.commands.generate_tokens">accounts.management.commands.generate_tokens module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.commands.html#module-accounts.management.commands.seed_demo">accounts.management.commands.seed_demo module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.commands.html#module-accounts.management.commands.setup_groups">accounts.management.commands.setup_groups module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.management.commands.html#module-accounts.management.commands">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.management.html#module-accounts.management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="accounts.migrations.html">accounts.migrations package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="accounts.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations.0001_initial">accounts.migrations.0001_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0001_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0001_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0001_initial.Migration.initial"><code class="docutils literal notranslate"><span class="pre">Migration.initial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0001_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations.0002_initial">accounts.migrations.0002_initial module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0002_initial.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0002_initial.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0002_initial.Migration.initial"><code class="docutils literal notranslate"><span class="pre">Migration.initial</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0002_initial.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations.0003_alter_customuser_email">accounts.migrations.0003_alter_customuser_email module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0003_alter_customuser_email.Migration"><code class="docutils literal notranslate"><span class="pre">Migration</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0003_alter_customuser_email.Migration.dependencies"><code class="docutils literal notranslate"><span class="pre">Migration.dependencies</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="accounts.migrations.html#accounts.migrations.0003_alter_customuser_email.Migration.operations"><code class="docutils literal notranslate"><span class="pre">Migration.operations</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="accounts.migrations.html#module-accounts.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-accounts.admin">
+<span id="accounts-admin-module"></span><h2>accounts.admin module<a class="headerlink" href="#module-accounts.admin" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.admin.</span></span><span class="sig-name descname"><span class="pre">CustomUserAdmin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">admin_site</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/admin.html#CustomUserAdmin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.admin.CustomUserAdmin" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserAdmin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.add_fieldsets">
+<span class="sig-name descname"><span class="pre">add_fieldsets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">((None,</span> <span class="pre">{'classes':</span> <span class="pre">('wide',),</span> <span class="pre">'fields':</span> <span class="pre">('username',</span> <span class="pre">'usable_password',</span> <span class="pre">'password1',</span> <span class="pre">'password2')}),</span> <span class="pre">('Role</span> <span class="pre">&amp;</span> <span class="pre">Profile',</span> <span class="pre">{'fields':</span> <span class="pre">('role',</span> <span class="pre">'bio',</span> <span class="pre">'avatar_url')}))</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.add_fieldsets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.fieldsets">
+<span class="sig-name descname"><span class="pre">fieldsets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">((None,</span> <span class="pre">{'fields':</span> <span class="pre">('username',</span> <span class="pre">'password')}),</span> <span class="pre">('Personal</span> <span class="pre">info',</span> <span class="pre">{'fields':</span> <span class="pre">('first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'email')}),</span> <span class="pre">('Permissions',</span> <span class="pre">{'fields':</span> <span class="pre">('is_active',</span> <span class="pre">'is_staff',</span> <span class="pre">'is_superuser',</span> <span class="pre">'groups',</span> <span class="pre">'user_permissions')}),</span> <span class="pre">('Important</span> <span class="pre">dates',</span> <span class="pre">{'fields':</span> <span class="pre">('last_login',</span> <span class="pre">'date_joined')}),</span> <span class="pre">('Role</span> <span class="pre">&amp;</span> <span class="pre">Profile',</span> <span class="pre">{'fields':</span> <span class="pre">('role',</span> <span class="pre">'bio',</span> <span class="pre">'avatar_url')}))</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.fieldsets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.list_display">
+<span class="sig-name descname"><span class="pre">list_display</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('username',</span> <span class="pre">'email',</span> <span class="pre">'first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'role',</span> <span class="pre">'is_active',</span> <span class="pre">'date_joined')</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.list_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.list_filter">
+<span class="sig-name descname"><span class="pre">list_filter</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('role',</span> <span class="pre">'is_active',</span> <span class="pre">'is_staff')</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.list_filter" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.media" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.ordering">
+<span class="sig-name descname"><span class="pre">ordering</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('-date_joined',)</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.ordering" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.admin.CustomUserAdmin.search_fields">
+<span class="sig-name descname"><span class="pre">search_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('username',</span> <span class="pre">'email',</span> <span class="pre">'first_name',</span> <span class="pre">'last_name')</span></span><a class="headerlink" href="#accounts.admin.CustomUserAdmin.search_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-accounts.apps">
+<span id="accounts-apps-module"></span><h2>accounts.apps module<a class="headerlink" href="#module-accounts.apps" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.apps.AccountsConfig">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.apps.</span></span><span class="sig-name descname"><span class="pre">AccountsConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_module</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/apps.html#AccountsConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.apps.AccountsConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.apps.AccountsConfig.default_auto_field">
+<span class="sig-name descname"><span class="pre">default_auto_field</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'django.db.models.BigAutoField'</span></span><a class="headerlink" href="#accounts.apps.AccountsConfig.default_auto_field" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.apps.AccountsConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'accounts'</span></span><a class="headerlink" href="#accounts.apps.AccountsConfig.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.apps.AccountsConfig.ready">
+<span class="sig-name descname"><span class="pre">ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/apps.html#AccountsConfig.ready"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.apps.AccountsConfig.ready" title="Link to this definition"></a></dt>
+<dd><p>Override this method in subclasses to run code when Django starts.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-accounts.decorators">
+<span id="accounts-decorators-module"></span><h2>accounts.decorators module<a class="headerlink" href="#module-accounts.decorators" title="Link to this heading"></a></h2>
+</section>
+<section id="module-accounts.forms">
+<span id="accounts-forms-module"></span><h2>accounts.forms module<a class="headerlink" href="#module-accounts.forms" title="Link to this heading"></a></h2>
+<p>Forms used by the accounts app.</p>
+<p>This module provides Django form classes for registration, authentication,
+and profile editing. It customizes widgets and field ordering for a
+consistent Bootstrap-friendly UI.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.forms.LoginForm">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.forms.</span></span><span class="sig-name descname"><span class="pre">LoginForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#LoginForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.forms.LoginForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationForm</span></code></p>
+<p>Authentication form with custom widget styling.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.LoginForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'password':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'username':</span> <span class="pre">&lt;django.contrib.auth.forms.UsernameField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.LoginForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.LoginForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'password':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'username':</span> <span class="pre">&lt;django.contrib.auth.forms.UsernameField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.LoginForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.forms.LoginForm.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.forms.LoginForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.forms.</span></span><span class="sig-name descname"><span class="pre">ProfileForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'id_%s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;class</span> <span class="pre">'django.forms.utils.ErrorList'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty_permitted</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_required_attribute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#ProfileForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.forms.ProfileForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></p>
+<p>Edit form for a user’s public profile fields.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.Meta">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/accounts/forms.html#ProfileForm.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.forms.ProfileForm.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'email',</span> <span class="pre">'bio',</span> <span class="pre">'avatar_url')</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#accounts.models.CustomUser" title="accounts.models.CustomUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustomUser</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.Meta.widgets">
+<span class="sig-name descname"><span class="pre">widgets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar_url':</span> <span class="pre">&lt;django.forms.widgets.URLInput</span> <span class="pre">object&gt;,</span> <span class="pre">'bio':</span> <span class="pre">&lt;django.forms.widgets.Textarea</span> <span class="pre">object&gt;,</span> <span class="pre">'email':</span> <span class="pre">&lt;django.forms.widgets.EmailInput</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.Meta.widgets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar_url':</span> <span class="pre">&lt;django.forms.fields.URLField</span> <span class="pre">object&gt;,</span> <span class="pre">'bio':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.forms.ProfileForm.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.forms.ProfileForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.forms.</span></span><span class="sig-name descname"><span class="pre">RegisterForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/forms.html#RegisterForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.forms.RegisterForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserCreationForm</span></code></p>
+<p>Form used to register a new user.</p>
+<p>Extends Django’s <cite>UserCreationForm</cite> to collect first name, last name,
+email and role in addition to username and password fields.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.Meta">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/accounts/forms.html#RegisterForm.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.forms.RegisterForm.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('username',</span> <span class="pre">'first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'email',</span> <span class="pre">'role',</span> <span class="pre">'password1',</span> <span class="pre">'password2')</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#accounts.models.CustomUser" title="accounts.models.CustomUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustomUser</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.Meta.widgets">
+<span class="sig-name descname"><span class="pre">widgets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'username':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.Meta.widgets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password1':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password2':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'username':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password1':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password2':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.forms.RegisterForm.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.forms.RegisterForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-accounts.management_forms">
+<span id="accounts-management-forms-module"></span><h2>accounts.management_forms module<a class="headerlink" href="#module-accounts.management_forms" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.management_forms.</span></span><span class="sig-name descname"><span class="pre">UserCreateForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_forms.html#UserCreateForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserCreateForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UserCreationForm</span></code></p>
+<p>Editors can create journalist or reader accounts.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.ALLOWED_ROLES">
+<span class="sig-name descname"><span class="pre">ALLOWED_ROLES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('journalist',</span> <span class="pre">'Journalist</span> <span class="pre">—</span> <span class="pre">can</span> <span class="pre">create,</span> <span class="pre">edit,</span> <span class="pre">delete</span> <span class="pre">articles</span> <span class="pre">&amp;</span> <span class="pre">newsletters'),</span> <span class="pre">('reader',</span> <span class="pre">'Reader</span> <span class="pre">—</span> <span class="pre">can</span> <span class="pre">only</span> <span class="pre">view</span> <span class="pre">approved</span> <span class="pre">articles</span> <span class="pre">and</span> <span class="pre">newsletters')]</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.ALLOWED_ROLES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.Meta">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/accounts/management_forms.html#UserCreateForm.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserCreateForm.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('username',</span> <span class="pre">'first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'email',</span> <span class="pre">'role')</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#accounts.models.CustomUser" title="accounts.models.CustomUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustomUser</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.Meta.widgets">
+<span class="sig-name descname"><span class="pre">widgets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'username':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.Meta.widgets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password1':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password2':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'username':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.clean_email">
+<span class="sig-name descname"><span class="pre">clean_email</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_forms.html#UserCreateForm.clean_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserCreateForm.clean_email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password1':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'password2':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.management_forms.UserCreateForm.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.management_forms.UserCreateForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.management_forms.</span></span><span class="sig-name descname"><span class="pre">UserEditForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_forms.html#UserEditForm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserEditForm" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></p>
+<p>Editors can update any user’s profile and role.
+Reader-specific M2M fields are shown only when role=reader.
+Journalist content fields are read-only reverse relations
+(shown in template).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.Meta">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Meta</span></span><a class="reference internal" href="_modules/accounts/management_forms.html#UserEditForm.Meta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserEditForm.Meta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.Meta.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('first_name',</span> <span class="pre">'last_name',</span> <span class="pre">'email',</span> <span class="pre">'role',</span> <span class="pre">'bio',</span> <span class="pre">'avatar_url',</span> <span class="pre">'is_active',</span> <span class="pre">'subscribed_publishers',</span> <span class="pre">'subscribed_journalists')</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.Meta.fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.Meta.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.Meta.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#accounts.models.CustomUser" title="accounts.models.CustomUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">CustomUser</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.Meta.widgets">
+<span class="sig-name descname"><span class="pre">widgets</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar_url':</span> <span class="pre">&lt;django.forms.widgets.URLInput</span> <span class="pre">object&gt;,</span> <span class="pre">'bio':</span> <span class="pre">&lt;django.forms.widgets.Textarea</span> <span class="pre">object&gt;,</span> <span class="pre">'email':</span> <span class="pre">&lt;django.forms.widgets.EmailInput</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;,</span> <span class="pre">'is_active':</span> <span class="pre">&lt;django.forms.widgets.CheckboxInput</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.widgets.TextInput</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.Meta.widgets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.ROLE_CHOICES_WITH_EDITOR">
+<span class="sig-name descname"><span class="pre">ROLE_CHOICES_WITH_EDITOR</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('reader',</span> <span class="pre">'Reader</span> <span class="pre">—</span> <span class="pre">view</span> <span class="pre">only'),</span> <span class="pre">('journalist',</span> <span class="pre">'Journalist</span> <span class="pre">—</span> <span class="pre">create,</span> <span class="pre">edit,</span> <span class="pre">delete'),</span> <span class="pre">('editor',</span> <span class="pre">'Editor</span> <span class="pre">—</span> <span class="pre">full</span> <span class="pre">access</span> <span class="pre">including</span> <span class="pre">approvals')]</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.ROLE_CHOICES_WITH_EDITOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.base_fields">
+<span class="sig-name descname"><span class="pre">base_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'avatar_url':</span> <span class="pre">&lt;django.forms.fields.URLField</span> <span class="pre">object&gt;,</span> <span class="pre">'bio':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'email':</span> <span class="pre">&lt;django.forms.fields.EmailField</span> <span class="pre">object&gt;,</span> <span class="pre">'first_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'is_active':</span> <span class="pre">&lt;django.forms.fields.BooleanField</span> <span class="pre">object&gt;,</span> <span class="pre">'last_name':</span> <span class="pre">&lt;django.forms.fields.CharField</span> <span class="pre">object&gt;,</span> <span class="pre">'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'subscribed_journalists':</span> <span class="pre">&lt;django.forms.models.ModelMultipleChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'subscribed_publishers':</span> <span class="pre">&lt;django.forms.models.ModelMultipleChoiceField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.base_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.clean_email">
+<span class="sig-name descname"><span class="pre">clean_email</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_forms.html#UserEditForm.clean_email"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserEditForm.clean_email" title="Link to this definition"></a></dt>
+<dd><p>Check if the email provided is in use,
+Ensures emails are unique.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.declared_fields">
+<span class="sig-name descname"><span class="pre">declared_fields</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'role':</span> <span class="pre">&lt;django.forms.fields.ChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'subscribed_journalists':</span> <span class="pre">&lt;django.forms.models.ModelMultipleChoiceField</span> <span class="pre">object&gt;,</span> <span class="pre">'subscribed_publishers':</span> <span class="pre">&lt;django.forms.models.ModelMultipleChoiceField</span> <span class="pre">object&gt;}</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.declared_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.media">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#accounts.management_forms.UserEditForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.management_forms.UserEditForm.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_forms.html#UserEditForm.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_forms.UserEditForm.save" title="Link to this definition"></a></dt>
+<dd><p>Save new user.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-accounts.management_views">
+<span id="accounts-management-views-module"></span><h2>accounts.management_views module<a class="headerlink" href="#module-accounts.management_views" title="Link to this heading"></a></h2>
+<p>Management views for user administration.</p>
+<p>These views are protected by the <cite>editor_required</cite> decorator and are
+intended for editors to list, inspect, create, edit and deactivate
+user accounts. Small docstrings and inline comments clarify behavior
+for maintainers and template authors.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.management_views.user_create_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.management_views.</span></span><span class="sig-name descname"><span class="pre">user_create_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_views.html#user_create_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_views.user_create_view" title="Link to this definition"></a></dt>
+<dd><p>Create a new user from the management interface.</p>
+<p>On success redirects to the newly created user’s detail page and
+flashes a message confirming account creation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.management_views.user_deactivate_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.management_views.</span></span><span class="sig-name descname"><span class="pre">user_deactivate_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_views.html#user_deactivate_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_views.user_deactivate_view" title="Link to this definition"></a></dt>
+<dd><p>Toggle the <cite>is_active</cite> flag for a user.</p>
+<p>Editors cannot deactivate their own account. The endpoint expects a
+POST request to perform the state toggle and provides feedback via
+Django messages.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.management_views.user_detail_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.management_views.</span></span><span class="sig-name descname"><span class="pre">user_detail_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_views.html#user_detail_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_views.user_detail_view" title="Link to this definition"></a></dt>
+<dd><p>Show detailed information about a single user.</p>
+<p>Returns the most recent articles and newsletters authored by the
+target user, basic approval stats, and role-specific context used by
+the admin templates.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.management_views.user_edit_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.management_views.</span></span><span class="sig-name descname"><span class="pre">user_edit_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_views.html#user_edit_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_views.user_edit_view" title="Link to this definition"></a></dt>
+<dd><p>Edit an existing user’s account.</p>
+<p>If the form is valid the changes are saved and the admin is
+redirected to the user’s detail page with a success message.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.management_views.user_list_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.management_views.</span></span><span class="sig-name descname"><span class="pre">user_list_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/management_views.html#user_list_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.management_views.user_list_view" title="Link to this definition"></a></dt>
+<dd><p>List users for administrative purposes.</p>
+<p>Supports optional filtering by search query, role and active status.
+Annotates each user with counts of related <cite>Article</cite> and
+<cite>Newsletter</cite> objects for convenient display in the template.</p>
+</dd></dl>
+
+</section>
+<section id="module-accounts.models">
+<span id="accounts-models-module"></span><h2>accounts.models module<a class="headerlink" href="#module-accounts.models" title="Link to this heading"></a></h2>
+<p>Account models for the project.</p>
+<p>This module defines <cite>CustomUser</cite>, an extension of Django’s
+<cite>AbstractUser</cite> that adds role-based behavior (reader, journalist,
+editor), subscription relations for readers, and convenience
+properties for role checks and related content access.</p>
+<p>The model also ensures the user is assigned to an appropriate
+Django <cite>Group</cite> on save and keeps reader-only subscription fields
+empty for non-readers.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="accounts.models.CustomUser">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">accounts.models.</span></span><span class="sig-name descname"><span class="pre">CustomUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/models.html#CustomUser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.models.CustomUser" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractUser</span></code></p>
+<p>Custom user model with role, subscriptions and helpers.</p>
+<p>Fields added:
+- <cite>role</cite>: determines permissions and group membership.
+- <cite>bio</cite>, <cite>avatar_url</cite>: optional profile fields.
+- <cite>subscribed_publishers</cite>, <cite>subscribed_journalists</cite>: M2M fields
+used by readers to follow publishers and journalists.</p>
+<p>The class exposes properties like <cite>is_reader</cite>, <cite>can_create_content</cite>,
+and related managers (<cite>journalist_articles</cite>, <cite>journalist_newsletters</cite>)
+to simplify view and template logic.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.DoesNotExist">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#accounts.models.CustomUser.DoesNotExist" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.MultipleObjectsReturned">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#accounts.models.CustomUser.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.NotUpdated">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#accounts.models.CustomUser.NotUpdated" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectNotUpdated</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">DatabaseError</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.ROLE_CHOICES">
+<span class="sig-name descname"><span class="pre">ROLE_CHOICES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[('reader',</span> <span class="pre">'Reader'),</span> <span class="pre">('journalist',</span> <span class="pre">'Journalist'),</span> <span class="pre">('editor',</span> <span class="pre">'Editor')]</span></span><a class="headerlink" href="#accounts.models.CustomUser.ROLE_CHOICES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.USERNAME_FIELD">
+<span class="sig-name descname"><span class="pre">USERNAME_FIELD</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'username'</span></span><a class="headerlink" href="#accounts.models.CustomUser.USERNAME_FIELD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.articles">
+<span class="sig-name descname"><span class="pre">articles</span></span><a class="headerlink" href="#accounts.models.CustomUser.articles" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_reverse_many_to_one_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.auth_token">
+<span class="sig-name descname"><span class="pre">auth_token</span></span><a class="headerlink" href="#accounts.models.CustomUser.auth_token" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related object on the reverse side of a one-to-one
+relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Restaurant</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">place</span> <span class="o">=</span> <span class="n">OneToOneField</span><span class="p">(</span><span class="n">Place</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;restaurant&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Place.restaurant</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseOneToOneDescriptor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.avatar_url">
+<span class="sig-name descname"><span class="pre">avatar_url</span></span><a class="headerlink" href="#accounts.models.CustomUser.avatar_url" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.bio">
+<span class="sig-name descname"><span class="pre">bio</span></span><a class="headerlink" href="#accounts.models.CustomUser.bio" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.can_approve">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">can_approve</span></span><a class="headerlink" href="#accounts.models.CustomUser.can_approve" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.can_create_content">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">can_create_content</span></span><a class="headerlink" href="#accounts.models.CustomUser.can_create_content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.date_joined">
+<span class="sig-name descname"><span class="pre">date_joined</span></span><a class="headerlink" href="#accounts.models.CustomUser.date_joined" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.editing_publishers">
+<span class="sig-name descname"><span class="pre">editing_publishers</span></span><a class="headerlink" href="#accounts.models.CustomUser.editing_publishers" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.email">
+<span class="sig-name descname"><span class="pre">email</span></span><a class="headerlink" href="#accounts.models.CustomUser.email" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.first_name">
+<span class="sig-name descname"><span class="pre">first_name</span></span><a class="headerlink" href="#accounts.models.CustomUser.first_name" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.get_next_by_date_joined">
+<span class="sig-name descname"><span class="pre">get_next_by_date_joined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">date_joined&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.models.CustomUser.get_next_by_date_joined" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.get_previous_by_date_joined">
+<span class="sig-name descname"><span class="pre">get_previous_by_date_joined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;django.db.models.fields.DateTimeField:</span> <span class="pre">date_joined&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.models.CustomUser.get_previous_by_date_joined" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.get_role_display">
+<span class="sig-name descname"><span class="pre">get_role_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;django.db.models.fields.CharField:</span> <span class="pre">role&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#accounts.models.CustomUser.get_role_display" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.get_role_display_badge">
+<span class="sig-name descname"><span class="pre">get_role_display_badge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/models.html#CustomUser.get_role_display_badge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.models.CustomUser.get_role_display_badge" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="headerlink" href="#accounts.models.CustomUser.groups" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#accounts.models.CustomUser.id" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_active">
+<span class="sig-name descname"><span class="pre">is_active</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_active" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_editor">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_editor</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_editor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_journalist">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_journalist</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_journalist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_reader">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_reader</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_reader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_staff">
+<span class="sig-name descname"><span class="pre">is_staff</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_staff" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.is_superuser">
+<span class="sig-name descname"><span class="pre">is_superuser</span></span><a class="headerlink" href="#accounts.models.CustomUser.is_superuser" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.journalist_articles">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">journalist_articles</span></span><a class="headerlink" href="#accounts.models.CustomUser.journalist_articles" title="Link to this definition"></a></dt>
+<dd><p>Returns articles authored by this journalist,
+None for non-journalists.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.journalist_independent_articles">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">journalist_independent_articles</span></span><a class="headerlink" href="#accounts.models.CustomUser.journalist_independent_articles" title="Link to this definition"></a></dt>
+<dd><p>Articles published independently (no publisher).
+None for non-journalists.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.journalist_independent_newsletters">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">journalist_independent_newsletters</span></span><a class="headerlink" href="#accounts.models.CustomUser.journalist_independent_newsletters" title="Link to this definition"></a></dt>
+<dd><p>Newsletters published independently. None for non-journalists.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.journalist_newsletters">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">journalist_newsletters</span></span><a class="headerlink" href="#accounts.models.CustomUser.journalist_newsletters" title="Link to this definition"></a></dt>
+<dd><p>Returns newsletters authored by this journalist,
+None for non-journalists.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.journalist_subscribers">
+<span class="sig-name descname"><span class="pre">journalist_subscribers</span></span><a class="headerlink" href="#accounts.models.CustomUser.journalist_subscribers" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.last_login">
+<span class="sig-name descname"><span class="pre">last_login</span></span><a class="headerlink" href="#accounts.models.CustomUser.last_login" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.last_name">
+<span class="sig-name descname"><span class="pre">last_name</span></span><a class="headerlink" href="#accounts.models.CustomUser.last_name" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.logentry_set">
+<span class="sig-name descname"><span class="pre">logentry_set</span></span><a class="headerlink" href="#accounts.models.CustomUser.logentry_set" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_reverse_many_to_one_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.newsletters">
+<span class="sig-name descname"><span class="pre">newsletters</span></span><a class="headerlink" href="#accounts.models.CustomUser.newsletters" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the reverse side of a
+many-to-one relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Child</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="n">ForeignKey</span><span class="p">(</span><span class="n">Parent</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;children&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Parent.children</span></code> is a <code class="docutils literal notranslate"><span class="pre">ReverseManyToOneDescriptor</span></code> instance.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_reverse_many_to_one_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.password">
+<span class="sig-name descname"><span class="pre">password</span></span><a class="headerlink" href="#accounts.models.CustomUser.password" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.publishing_for">
+<span class="sig-name descname"><span class="pre">publishing_for</span></span><a class="headerlink" href="#accounts.models.CustomUser.publishing_for" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.reader_subscribed_journalists">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">reader_subscribed_journalists</span></span><a class="headerlink" href="#accounts.models.CustomUser.reader_subscribed_journalists" title="Link to this definition"></a></dt>
+<dd><p>Returns the subscribed_journalists queryset for readers,
+None for other roles.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.reader_subscribed_publishers">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">reader_subscribed_publishers</span></span><a class="headerlink" href="#accounts.models.CustomUser.reader_subscribed_publishers" title="Link to this definition"></a></dt>
+<dd><p>Returns the subscribed_publishers queryset for readers,
+None for other roles.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.role">
+<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#accounts.models.CustomUser.role" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/models.html#CustomUser.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.models.CustomUser.save" title="Link to this definition"></a></dt>
+<dd><p>Persist the user and enforce role-related side effects.</p>
+<p>After saving the model fields, ensure the user’s Django <cite>Group</cite>
+membership reflects their <cite>role</cite> and clear any reader-only
+subscription relations when the role is not <cite>reader</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.subscribed_journalists">
+<span class="sig-name descname"><span class="pre">subscribed_journalists</span></span><a class="headerlink" href="#accounts.models.CustomUser.subscribed_journalists" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.subscribed_publishers">
+<span class="sig-name descname"><span class="pre">subscribed_publishers</span></span><a class="headerlink" href="#accounts.models.CustomUser.subscribed_publishers" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.user_permissions">
+<span class="sig-name descname"><span class="pre">user_permissions</span></span><a class="headerlink" href="#accounts.models.CustomUser.user_permissions" title="Link to this definition"></a></dt>
+<dd><p>Accessor to the related objects manager on the forward and reverse sides of
+a many-to-many relation.</p>
+<p>In the example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">,</span> <span class="n">related_name</span><span class="o">=</span><span class="s1">&#39;pizzas&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings</span></code> and <code class="docutils literal notranslate"><span class="pre">Topping.pizzas</span></code> are <code class="docutils literal notranslate"><span class="pre">ManyToManyDescriptor</span></code>
+instances.</p>
+<p>Most of the implementation is delegated to a dynamically defined manager
+class built by <code class="docutils literal notranslate"><span class="pre">create_forward_many_to_many_manager()</span></code> defined below.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="accounts.models.CustomUser.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#accounts.models.CustomUser.username" title="Link to this definition"></a></dt>
+<dd><p>A wrapper for a deferred-loading field. When the value is read from this
+object the first time, the query is executed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-accounts.signals">
+<span id="accounts-signals-module"></span><h2>accounts.signals module<a class="headerlink" href="#module-accounts.signals" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.signals.create_auth_token">
+<span class="sig-prename descclassname"><span class="pre">accounts.signals.</span></span><span class="sig-name descname"><span class="pre">create_auth_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/signals.html#create_auth_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.signals.create_auth_token" title="Link to this definition"></a></dt>
+<dd><p>Automatically generates a DRF Token whenever a new user is saved.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.signals.create_groups">
+<span class="sig-prename descclassname"><span class="pre">accounts.signals.</span></span><span class="sig-name descname"><span class="pre">create_groups</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/signals.html#create_groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.signals.create_groups" title="Link to this definition"></a></dt>
+<dd><p>Triggers the group setup after migrations finish.</p>
+</dd></dl>
+
+</section>
+<section id="module-accounts.urls">
+<span id="accounts-urls-module"></span><h2>accounts.urls module<a class="headerlink" href="#module-accounts.urls" title="Link to this heading"></a></h2>
+</section>
+<section id="module-accounts.views">
+<span id="accounts-views-module"></span><h2>accounts.views module<a class="headerlink" href="#module-accounts.views" title="Link to this heading"></a></h2>
+<p>Views for user accounts: registration, authentication, profiles.</p>
+<p>This module contains simple Django view functions used by the
+<cite>accounts</cite> app. Each view handles request/response logic and uses
+Django forms and messages for user feedback.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.journalist_list_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">journalist_list_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#journalist_list_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.journalist_list_view" title="Link to this definition"></a></dt>
+<dd><p>List all users that have the <cite>journalist</cite> role.</p>
+<p>The view orders journalists by last name and renders a simple list
+template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> – Django HttpRequest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered list of journalists.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.journalist_public_profile">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">journalist_public_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pk</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#journalist_public_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.journalist_public_profile" title="Link to this definition"></a></dt>
+<dd><p>Show a public profile for a journalist.</p>
+<ul class="simple">
+<li><p>If the requested profile belongs to the currently authenticated
+journalist, redirect them to their editable <cite>profile</cite> page.</p></li>
+<li><p>Otherwise, show the journalist’s public information and a list
+of their approved articles (limited to 10 most recent).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> – Django HttpRequest</p></li>
+<li><p><strong>pk</strong> – int - primary key of the <cite>CustomUser</cite> with role ‘journalist’</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rendered public profile page.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.login_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">login_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#login_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.login_view" title="Link to this definition"></a></dt>
+<dd><p>Authenticate and log a user in.</p>
+<ul class="simple">
+<li><p>Redirect authenticated users to the dashboard.</p></li>
+<li><p>On POST, validate <cite>LoginForm</cite>, log the user in and redirect to
+<cite>next</cite> parameter if provided, otherwise to the dashboard.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> – Django HttpRequest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>render of login page or redirect on success.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.logout_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">logout_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#logout_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.logout_view" title="Link to this definition"></a></dt>
+<dd><p>Log the current user out and redirect to the login page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> – Django HttpRequest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>redirect to the login page.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponseRedirect</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.profile_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">profile_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#profile_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.profile_view" title="Link to this definition"></a></dt>
+<dd><p>Display and update the authenticated user’s profile.</p>
+<p>Uses <cite>ProfileForm</cite> bound to <cite>request.user</cite>. On successful POST the
+profile is saved and the user is redirected back to the profile page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> – Django HttpRequest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>render of profile page.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.register_view">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">register_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#register_view"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.register_view" title="Link to this definition"></a></dt>
+<dd><p>Handle user registration.</p>
+<ul class="simple">
+<li><p>Redirect authenticated users to the dashboard.</p></li>
+<li><p>On POST, validate <cite>RegisterForm</cite>, create the user, log them in,
+show a success message and redirect to the dashboard.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> – Django HttpRequest</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>render of registration page or redirect on success.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponse</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="accounts.views.toggle_subscription">
+<span class="sig-prename descclassname"><span class="pre">accounts.views.</span></span><span class="sig-name descname"><span class="pre">toggle_subscription</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/accounts/views.html#toggle_subscription"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#accounts.views.toggle_subscription" title="Link to this definition"></a></dt>
+<dd><p>Toggle subscription for the authenticated reader.</p>
+<p>Readers can subscribe/unsubscribe to journalists or publishers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request</strong> – Django HttpRequest</p></li>
+<li><p><strong>target_type</strong> – str - either ‘journalist’ or ‘publisher’</p></li>
+<li><p><strong>target_id</strong> – int - primary key of the target object</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>redirect back to the referring page or
+dashboard if no referrer is present.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>HttpResponseRedirect</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-accounts">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-accounts" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="news_project" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="accounts.management.html" class="btn btn-neutral float-right" title="accounts.management package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Stefan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

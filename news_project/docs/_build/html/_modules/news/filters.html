@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news.filters &mdash; Newsroom 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Newsroom
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">news_project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Newsroom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news.filters</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news.filters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Filter helpers for news article querysets.</span>
+
+<span class="sd">This module provides shared filtering logic used by article list views,</span>
+<span class="sd">search pages, and admin filtering. It returns both the filtered queryset and</span>
+<span class="sd">a dictionary of active filters for display in templates and UI summaries.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">accounts.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomUser</span>
+
+
+<div class="viewcode-block" id="apply_article_filters">
+<a class="viewcode-back" href="../../news.html#news.filters.apply_article_filters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_article_filters</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply user-facing filters to an Article queryset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        queryset: Initial Article queryset to filter.</span>
+<span class="sd">        params: Query parameters dict, typically request.GET.</span>
+<span class="sd">        user: Optional user instance for permission-aware filtering.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (filtered_queryset, active_filters_dict)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">active_filters</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Restrict readers to approved articles only.</span>
+    <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">is_reader</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Full-text search across title, content, and author fields.</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">title__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">content__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">author__first_name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">author__last_name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">author__username__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;q&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
+
+    <span class="c1"># Status filter: approved or pending review.</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;approved&#39;</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Approved&#39;</span>
+    <span class="k">elif</span> <span class="n">status</span> <span class="o">==</span> <span class="s1">&#39;pending&#39;</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">approved</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Pending Review&#39;</span>
+
+    <span class="c1"># Publisher filter: independent publishers or a specific publisher.</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">publisher</span> <span class="o">==</span> <span class="s1">&#39;independent&#39;</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">publisher__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;publisher&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Independent&#39;</span>
+    <span class="k">elif</span> <span class="n">publisher</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">publisher_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">publisher</span><span class="p">)</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">publisher__id</span><span class="o">=</span><span class="n">publisher_id</span><span class="p">)</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">news.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span> <span class="k">as</span> <span class="n">Pub</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pub_name</span> <span class="o">=</span> <span class="n">Pub</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">publisher_id</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;publisher&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pub_name</span>
+            <span class="k">except</span> <span class="n">Pub</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># Author filter by id, also capture display name if available.</span>
+    <span class="n">author_id</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">author_id</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">author_pk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">author_id</span><span class="p">)</span>
+            <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author__id</span><span class="o">=</span><span class="n">author_pk</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">author</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">author_pk</span><span class="p">)</span>
+                <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">author</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="ow">or</span> <span class="n">author</span><span class="o">.</span><span class="n">username</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># Date range filtering.</span>
+    <span class="n">date_from</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;date_from&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">date_to</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;date_to&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">date_from</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">created_at__date__gte</span><span class="o">=</span><span class="n">date_from</span><span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;date_from&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_from</span>
+    <span class="k">if</span> <span class="n">date_to</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">created_at__date__lte</span><span class="o">=</span><span class="n">date_to</span><span class="p">)</span>
+        <span class="n">active_filters</span><span class="p">[</span><span class="s1">&#39;date_to&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_to</span>
+
+    <span class="c1"># Sorting options with default ordering by date.</span>
+    <span class="n">sort</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sort&#39;</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;desc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="n">sort_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;date&#39;</span><span class="p">:</span>   <span class="s1">&#39;created_at&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span>  <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="s1">&#39;author__last_name&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;approved&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">sort_field</span> <span class="o">=</span> <span class="n">sort_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sort</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">order</span> <span class="o">==</span> <span class="s1">&#39;asc&#39;</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">sort_field</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">queryset</span> <span class="o">=</span> <span class="n">queryset</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;-</span><span class="si">{</span><span class="n">sort_field</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">queryset</span><span class="p">,</span> <span class="n">active_filters</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Stefan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

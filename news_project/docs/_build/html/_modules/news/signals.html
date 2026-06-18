@@ -1,0 +1,327 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news.signals &mdash; Newsroom 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Newsroom
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">news_project</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Newsroom</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news.signals</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news.signals</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Signal handlers and helpers for post-approval workflows.</span>
+
+<span class="sd">This module performs post-approval tasks for `Article` instances, including:</span>
+<span class="sd">- Gathering subscriber email addresses (journalist- and publisher-subscribers),</span>
+<span class="sd">- Sending notification emails to subscribers, and</span>
+<span class="sd">- Posting a lightweight notification to an internal endpoint for further</span>
+<span class="sd">  integration (runs in a background thread to avoid blocking requests).</span>
+
+<span class="sd">Signal handlers are intentionally tolerant of missing related data and</span>
+<span class="sd">network failures — logging warnings instead of raising errors so that the</span>
+<span class="sd">main application flow is unaffected by non-critical post-save actions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_save</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">receiver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">send_mail</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_subscriber_emails</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gather email addresses of users who have subscribed to:</span>
+<span class="sd">    - the article&#39;s journalist (author), or</span>
+<span class="sd">    - the article&#39;s publisher.</span>
+
+<span class="sd">    Returns a deduplicated list of email strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">emails</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Readers subscribed to this journalist (direct M2M on the author)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">journalist_subscribers</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">journalist_subscribers</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">journalist_subscribers</span><span class="p">:</span>
+            <span class="c1"># Only collect valid email addresses</span>
+            <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
+                <span class="n">emails</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># Defensive logging — failures here should not prevent the main flow</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Could not fetch journalist subscribers: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+    <span class="c1"># Readers subscribed to this publisher (publisher may be None)</span>
+    <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Primary attempt: use the publisher&#39;s related subscriber set</span>
+            <span class="n">publisher_subscribers</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">subscriber_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">publisher_subscribers</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
+                    <span class="n">emails</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># Fallback: query the CustomUser M2M relationship if the reverse</span>
+            <span class="c1"># accessor isn&#39;t available (defensive compatibility handling).</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">accounts.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomUser</span>
+                <span class="n">publisher_subscribers</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">subscribed_publishers</span><span class="o">=</span><span class="n">article</span><span class="o">.</span><span class="n">publisher</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">publisher_subscribers</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">:</span>
+                        <span class="n">emails</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc2</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s1">&#39;Could not fetch publisher subscribers: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">exc2</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">emails</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_send_approval_emails</span><span class="p">(</span><span class="n">article</span><span class="p">,</span> <span class="n">subscriber_emails</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send notification emails to all subscribers.</span>
+
+<span class="sd">       This uses Django&#39;s `send_mail` which will obey the configured email</span>
+<span class="sd">       backend; in development this may be the console backend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">subscriber_emails</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;No subscribers to notify for article &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">subject</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;New Article Published: </span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">publisher_name</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span> <span class="k">else</span> <span class="s1">&#39;Independent&#39;</span>
+    <span class="p">)</span>
+    <span class="n">author_name</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="ow">or</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">username</span>
+    <span class="c1"># Short content snippet for the email body</span>
+    <span class="n">snippet</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">content</span><span class="p">[:</span><span class="mi">300</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+        <span class="s1">&#39;…&#39;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">article</span><span class="o">.</span><span class="n">content</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">300</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Compose a simple plain-text notification message</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;Hello,</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;A new article has been published that you may be interested in.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;Title:     </span><span class="si">{</span><span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;Author:    </span><span class="si">{</span><span class="n">author_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;Publisher: </span><span class="si">{</span><span class="n">publisher_name</span><span class="si">}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">snippet</span><span class="si">}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;Log in to the Newsroom to read the full article.</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="sa">f</span><span class="s1">&#39;— The Newsroom Team&#39;</span>
+    <span class="p">)</span>
+
+    <span class="n">from_email</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;DEFAULT_FROM_EMAIL&#39;</span><span class="p">,</span> <span class="s1">&#39;newsroom@example.com&#39;</span>
+    <span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># `fail_silently=False` ensures exceptions bubble here for logging.</span>
+        <span class="n">send_mail</span><span class="p">(</span>
+            <span class="n">subject</span><span class="o">=</span><span class="n">subject</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">from_email</span><span class="o">=</span><span class="n">from_email</span><span class="p">,</span>
+            <span class="n">recipient_list</span><span class="o">=</span><span class="n">subscriber_emails</span><span class="p">,</span>
+            <span class="n">fail_silently</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;Approval email sent to </span><span class="si">%d</span><span class="s1"> subscriber(s) for article &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">subscriber_emails</span><span class="p">),</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># Log failure; email sending is non-critical for the main flow.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Failed to send approval emails: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_post_to_approved_endpoint</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;POST article data to the internal /api/approved/ endpoint.</span>
+
+<span class="sd">       Runs in a background thread so it doesn&#39;t block the request cycle. This</span>
+<span class="sd">       function is tolerant of missing `requests` library or network failures</span>
+<span class="sd">       — it will log warnings but not raise errors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">requests</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">req_lib</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="c1"># The integration is optional; do not treat missing requests as fatal.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s1">&#39;requests library not installed — skipping internal API POST.&#39;</span>
+        <span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">author_name</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">get_full_name</span><span class="p">()</span> <span class="ow">or</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span><span class="o">.</span><span class="n">username</span>
+    <span class="n">publisher_name</span> <span class="o">=</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">article</span><span class="o">.</span><span class="n">publisher</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;article_id&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="s1">&#39;author&#39;</span><span class="p">:</span> <span class="n">author_name</span><span class="p">,</span>
+        <span class="s1">&#39;publisher&#39;</span><span class="p">:</span> <span class="n">publisher_name</span><span class="p">,</span>
+        <span class="s1">&#39;approved&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">approved</span><span class="p">,</span>
+        <span class="s1">&#39;word_count&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">word_count</span><span class="p">,</span>
+        <span class="s1">&#39;created_at&#39;</span><span class="p">:</span> <span class="n">article</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Use the development server port if provided in settings; default 8000.</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s1">&#39;DEV_SERVER_PORT&#39;</span><span class="p">,</span> <span class="mi">8000</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;http://127.0.0.1:</span><span class="si">{</span><span class="n">port</span><span class="si">}</span><span class="s1">/api/approved/&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Perform a short, synchronous POST with a timeout so the thread exits</span>
+        <span class="c1"># quickly if the internal service is unavailable.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">req_lib</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s1">&#39;Internal API POST to </span><span class="si">%s</span><span class="s1"> — status </span><span class="si">%d</span><span class="s1"> — body: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># Non-critical: network failures should not affect application flow.</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Internal API POST failed (non-critical): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="on_article_save">
+<a class="viewcode-back" href="../../news.html#news.signals.on_article_save">[docs]</a>
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">post_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">Article</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">on_article_save</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Signal handler triggered after an Article is saved.</span>
+
+<span class="sd">       The handler performs post-approval actions only when the article has</span>
+<span class="sd">       just been approved. To avoid triggering on unrelated saves, the view</span>
+<span class="sd">       or model code sets a `_approval_just_toggled` sentinel on the instance</span>
+<span class="sd">       around the save() call; this handler checks that flag to decide.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ignore if the article is not approved after save.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">instance</span><span class="o">.</span><span class="n">approved</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="c1"># The `_approval_just_toggled` sentinel is expected to be set by the</span>
+    <span class="c1"># code path that flips approval (e.g., an admin view or action).</span>
+    <span class="c1"># This distinguishes a genuine transition from other saves.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;_approval_just_toggled&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s1">&#39;Article &quot;</span><span class="si">%s</span><span class="s1">&quot; (pk=</span><span class="si">%d</span><span class="s1">) approved — running post-approval actions.&#39;</span><span class="p">,</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">pk</span>
+    <span class="p">)</span>
+
+    <span class="c1"># 1. Collect subscriber emails (may perform multiple DB queries).</span>
+    <span class="n">subscriber_emails</span> <span class="o">=</span> <span class="n">_collect_subscriber_emails</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+    <span class="c1"># 2. Send notification emails to subscribers.</span>
+    <span class="c1"># In development the email backend may be a console backend; in</span>
+    <span class="c1"># production this will use the configured SMTP/relay settings.</span>
+    <span class="n">_send_approval_emails</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">subscriber_emails</span><span class="p">)</span>
+
+    <span class="c1"># 3. Notify internal integrations via a background thread so we don&#39;t</span>
+    <span class="c1"># block the request/response cycle. The handler does not wait for this</span>
+    <span class="c1"># thread; failures are logged non-fatally by the worker.</span>
+    <span class="n">thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
+        <span class="n">target</span><span class="o">=</span><span class="n">_post_to_approved_endpoint</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">instance</span><span class="p">,),</span>
+        <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Stefan.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
