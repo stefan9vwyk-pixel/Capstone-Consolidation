@@ -64,9 +64,9 @@ WSGI_APPLICATION = 'news_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'newsroom_db',
-        'USER': 'newsroom_user',
-        'PASSWORD': 'stefan@1997',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
         'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {
