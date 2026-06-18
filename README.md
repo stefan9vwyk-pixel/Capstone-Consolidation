@@ -37,7 +37,7 @@ Before setting up your environment, you need to get a local copy of this reposit
 2. Navigate to the directory where you want to save the project folder.
 3. Run the following command to download the repository:
    ```bash
-   git clone https://github.com
+   git clone https://github.com/stefan9vwyk-pixel/Capstone-Consolidation.git
    ```
 4. Move into the newly cloned project directory:
    ```bash
