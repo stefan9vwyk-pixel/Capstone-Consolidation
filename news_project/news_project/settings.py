@@ -67,7 +67,7 @@ DATABASES = {
         'NAME': 'newsroom_db',
         'USER': 'newsroom_user',
         'PASSWORD': 'stefan@1997',
-        'HOST': '127.0.0.1',
+        'HOST': 'host.docker.internal',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
